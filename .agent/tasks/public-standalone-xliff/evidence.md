@@ -44,12 +44,19 @@ Evidence:
 
 ## AC5: Public GitHub repository
 
-UNKNOWN.
+PASS.
 
-Evidence pending until git initialization, GitHub repo creation, and push complete.
+Evidence:
+- Repository URL: `https://github.com/KikuAI-Lab/articulate-xliff-import-doctor`
+- Fresh command: `gh repo view KikuAI-Lab/articulate-xliff-import-doctor --json name,visibility,url,isPrivate`
+- Result: `visibility=PUBLIC`, `isPrivate=false`.
+- Branch `main` tracks `origin/main`.
 
 ## AC6: Project-map sync
 
-UNKNOWN.
+BLOCKED.
 
-Evidence pending after public repository URL exists.
+Evidence:
+- Project-map update was attempted after the public repository URL existed.
+- `/Users/nick/dev/kikuai-project-map` already had unrelated dirty files and index refresh noise across multiple files.
+- No project-map commit or push was made to avoid absorbing unrelated work-in-progress into this task.

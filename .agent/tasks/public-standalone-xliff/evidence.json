@@ -18,12 +18,12 @@
       "proof": "README documents quick start, supported safe repairs, limits, privacy model, hosted tool link, and license."
     },
     "AC5": {
-      "status": "UNKNOWN",
-      "proof": "Pending GitHub repository creation and push."
+      "status": "PASS",
+      "proof": "GitHub reports https://github.com/KikuAI-Lab/articulate-xliff-import-doctor as visibility=PUBLIC and isPrivate=false; main tracks origin/main."
     },
     "AC6": {
-      "status": "UNKNOWN",
-      "proof": "Pending project-map sync after public repo URL exists."
+      "status": "BLOCKED",
+      "proof": "Project-map sync was not committed because /Users/nick/dev/kikuai-project-map had unrelated dirty files and index refresh noise across multiple files."
     }
   }
 }
