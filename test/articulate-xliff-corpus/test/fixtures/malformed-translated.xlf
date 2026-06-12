@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file original="course.story" source-language="en-US" target-language="fr-FR" datatype="x-articulate">
+    <body>
+      <trans-unit id="slide-1-title">
+        <source>Welcome learner</source>
+        <target>Bienvenue apprenant</target>
+      </trans-unit>
+    </body>
+  </file>

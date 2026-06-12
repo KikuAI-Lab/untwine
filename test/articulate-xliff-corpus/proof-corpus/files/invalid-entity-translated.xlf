@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file original="course.story" source-language="en-US" target-language="fr-FR" datatype="x-articulate">
+    <body>
+      <trans-unit id="slide-1-title">
+        <source>Welcome <x id="1" ctype="x-bold"/> learner</source>
+        <target>Bienvenue&nbsp;<x id="1" ctype="x-bold"/> learner</target>
+      </trans-unit>
+      <trans-unit id="slide-1-body">
+        <source>Click <g id="2" ctype="x-link">continue</g>.</source>
+        <target>Click <g id="2" ctype="x-link">continue</g>.</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
+

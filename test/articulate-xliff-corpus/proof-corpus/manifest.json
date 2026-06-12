@@ -1,0 +1,242 @@
+{
+  "version": 1,
+  "description": "Product proof corpus for browser-local Articulate XLIFF import-error analysis.",
+  "defaultOriginal": "test/fixtures/valid-original.xlf",
+  "cases": [
+    {
+      "id": "valid-clean-xliff12",
+      "title": "Valid Articulate-like XLIFF 1.2 pair",
+      "translated": "test/fixtures/valid-translated.xlf",
+      "expected": {
+        "ok": true,
+        "repairability": "clean",
+        "categories": [],
+        "unsupportedCode": null,
+        "repairOk": true
+      }
+    },
+    {
+      "id": "changed-id-safe-repair",
+      "title": "Translated trans-unit ID changed by CAT tool",
+      "translated": "test/fixtures/changed-id-translated.xlf",
+      "expected": {
+        "ok": false,
+        "repairability": "repairable",
+        "categories": ["changed_trans_unit_id"],
+        "unsupportedCode": null,
+        "repairOk": true,
+        "remainingCriticalAfterRepair": 0
+      }
+    },
+    {
+      "id": "missing-id-safe-repair",
+      "title": "Translated trans-unit ID removed",
+      "translated": "proof-corpus/files/missing-id-translated.xlf",
+      "expected": {
+        "ok": false,
+        "repairability": "repairable",
+        "categories": ["missing_trans_unit_id"],
+        "unsupportedCode": null,
+        "repairOk": true,
+        "remainingCriticalAfterRepair": 0
+      }
+    },
+    {
+      "id": "encoding-declaration-safe-repair",
+      "title": "XML declaration advertises non-UTF-8 encoding",
+      "translated": "test/fixtures/encoding-mismatch-translated.xlf",
+      "expected": {
+        "ok": false,
+        "repairability": "repairable",
+        "categories": ["encoding_declaration_mismatch"],
+        "unsupportedCode": null,
+        "repairOk": true,
+        "remainingCriticalAfterRepair": 0
+      }
+    },
+    {
+      "id": "bom-plus-encoding-safe-repair",
+      "title": "UTF-8 BOM plus non-UTF-8 XML declaration",
+      "translated": "test/fixtures/encoding-mismatch-translated.xlf",
+      "prependBom": true,
+      "expected": {
+        "ok": false,
+        "repairability": "repairable",
+        "categories": ["encoding_bom", "encoding_declaration_mismatch"],
+        "unsupportedCode": null,
+        "repairOk": true,
+        "remainingCriticalAfterRepair": 0
+      }
+    },
+    {
+      "id": "missing-target-manual-review",
+      "title": "Translated unit is missing target element",
+      "translated": "test/fixtures/missing-target-translated.xlf",
+      "expected": {
+        "ok": false,
+        "repairability": "manual_review",
+        "categories": ["missing_target"],
+        "unsupportedCode": null,
+        "repairOk": false
+      }
+    },
+    {
+      "id": "inline-tag-count-drift-manual-review",
+      "title": "Protected inline tag was removed from translated target",
+      "translated": "test/fixtures/inline-tag-count-mismatch-translated.xlf",
+      "expected": {
+        "ok": false,
+        "repairability": "manual_review",
+        "categories": ["source_target_tag_count_drift", "protected_inline_tag_rewrite"],
+        "unsupportedCode": null,
+        "repairOk": false
+      }
+    },
+    {
+      "id": "mrk-segmentation-drift-manual-review",
+      "title": "CAT tool wrapped translated target in mrk segmentation markers",
+      "translated": "proof-corpus/files/mrk-segmentation-translated.xlf",
+      "expected": {
+        "ok": false,
+        "repairability": "manual_review",
+        "categories": ["source_target_tag_count_drift"],
+        "unsupportedCode": null,
+        "repairOk": false
+      }
+    },
+    {
+      "id": "protected-inline-rewrite-manual-review",
+      "title": "Protected inline tag ID was rewritten while tag count stayed equal",
+      "translated": "proof-corpus/files/protected-inline-rewrite-translated.xlf",
+      "expected": {
+        "ok": false,
+        "repairability": "manual_review",
+        "categories": ["protected_inline_tag_rewrite"],
+        "unsupportedCode": null,
+        "repairOk": false
+      }
+    },
+    {
+      "id": "namespace-drift-unrepairable",
+      "title": "Translated file namespace drifted away from XLIFF 1.2",
+      "translated": "test/fixtures/namespace-mismatch-translated.xlf",
+      "expected": {
+        "ok": false,
+        "repairability": "unrepairable",
+        "categories": ["namespace_version_drift"],
+        "unsupportedCode": null,
+        "repairOk": false
+      }
+    },
+    {
+      "id": "missing-trans-unit-unrepairable",
+      "title": "Translated file lost one trans-unit",
+      "translated": "proof-corpus/files/missing-trans-unit-translated.xlf",
+      "expected": {
+        "ok": false,
+        "repairability": "unrepairable",
+        "categories": ["missing_trans_unit_id"],
+        "unsupportedCode": null,
+        "repairOk": false
+      }
+    },
+    {
+      "id": "extra-trans-unit-unrepairable",
+      "title": "Translated file contains an extra trans-unit",
+      "translated": "proof-corpus/files/extra-trans-unit-translated.xlf",
+      "expected": {
+        "ok": false,
+        "repairability": "unrepairable",
+        "categories": ["missing_trans_unit_id"],
+        "unsupportedCode": null,
+        "repairOk": false
+      }
+    },
+    {
+      "id": "malformed-xml-unsupported",
+      "title": "Translated XML is not well formed",
+      "translated": "test/fixtures/malformed-translated.xlf",
+      "expected": {
+        "ok": false,
+        "repairability": "unsupported",
+        "categories": ["malformed_xml"],
+        "unsupportedCode": "malformed_xml",
+        "repairOk": false
+      }
+    },
+    {
+      "id": "invalid-entity-unsupported",
+      "title": "Translated XML contains unsupported HTML entity",
+      "translated": "proof-corpus/files/invalid-entity-translated.xlf",
+      "expected": {
+        "ok": false,
+        "repairability": "unsupported",
+        "categories": ["invalid_entities"],
+        "unsupportedCode": "invalid_entities",
+        "repairOk": false
+      }
+    },
+    {
+      "id": "wrong-wrapper-unsupported",
+      "title": "Translated file is XML but not XLIFF",
+      "translated": "test/fixtures/wrong-wrapper-translated.xlf",
+      "expected": {
+        "ok": false,
+        "repairability": "unsupported",
+        "categories": ["wrong_wrapper"],
+        "unsupportedCode": "wrong_wrapper",
+        "repairOk": false
+      }
+    },
+    {
+      "id": "xliff20-unsupported",
+      "title": "Translated file is XLIFF 2.0",
+      "translated": "test/fixtures/unsupported-xliff20-translated.xlf",
+      "expected": {
+        "ok": false,
+        "repairability": "unsupported",
+        "categories": ["unsupported_xliff_version"],
+        "unsupportedCode": "unsupported_xliff_version",
+        "repairOk": false
+      }
+    },
+    {
+      "id": "xliff10-unsupported",
+      "title": "Translated file is old XLIFF 1.0",
+      "translated": "proof-corpus/files/unsupported-xliff10-translated.xlf",
+      "expected": {
+        "ok": false,
+        "repairability": "unsupported",
+        "categories": ["unsupported_xliff_version"],
+        "unsupportedCode": "unsupported_xliff_version",
+        "repairOk": false
+      }
+    },
+    {
+      "id": "wrong-extension-unsupported",
+      "title": "Translated XLIFF content is uploaded with wrong extension",
+      "translated": "test/fixtures/valid-translated.xlf",
+      "translatedFileName": "translated.xml",
+      "expected": {
+        "ok": false,
+        "repairability": "unsupported",
+        "categories": ["wrong_extension"],
+        "unsupportedCode": "wrong_extension",
+        "repairOk": false
+      }
+    },
+    {
+      "id": "combined-safe-repairs",
+      "title": "Changed ID plus encoding declaration mismatch",
+      "translated": "proof-corpus/files/changed-id-encoding-translated.xlf",
+      "expected": {
+        "ok": false,
+        "repairability": "repairable",
+        "categories": ["changed_trans_unit_id", "encoding_declaration_mismatch"],
+        "unsupportedCode": null,
+        "repairOk": true,
+        "remainingCriticalAfterRepair": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "name": "articulate-xliff-import-doctor",
+  "version": "0.1.0",
+  "description": "Local-first Articulate Rise and Storyline XLIFF import-error diagnosis and safe repair.",
+  "type": "module",
+  "license": "AGPL-3.0-only",
+  "author": "KikuAI OÜ",
+  "homepage": "https://kikuai.dev/fix-articulate-xliff-import-error/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KikuAI-Lab/articulate-xliff-import-doctor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/KikuAI-Lab/articulate-xliff-import-doctor/issues"
+  },
+  "bin": {
+    "articulate-xliff-doctor": "./bin/articulate-xliff-doctor.js"
+  },
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "demo-files/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "check": "npm test",
+    "test": "node --test test/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "articulate",
+    "rise",
+    "storyline",
+    "xliff",
+    "xlf",
+    "translation",
+    "local-first"
+  ]
+}

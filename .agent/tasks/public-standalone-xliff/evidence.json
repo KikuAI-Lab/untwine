@@ -1,0 +1,29 @@
+{
+  "taskId": "public-standalone-xliff",
+  "criteria": {
+    "AC1": {
+      "status": "PASS",
+      "proof": "Portable src/index.js and src/xml.js copied without Nuxt/Vue/site analytics/payment/build coupling."
+    },
+    "AC2": {
+      "status": "PASS",
+      "proof": "CLI analyze and repair commands exist; manual repair wrote /tmp/demo-articulate-translated-safe-repair.repaired.xlf with 0 critical issues after repair."
+    },
+    "AC3": {
+      "status": "PASS",
+      "proof": "npm test returned 3 pass, 0 fail."
+    },
+    "AC4": {
+      "status": "PASS",
+      "proof": "README documents quick start, supported safe repairs, limits, privacy model, hosted tool link, and license."
+    },
+    "AC5": {
+      "status": "UNKNOWN",
+      "proof": "Pending GitHub repository creation and push."
+    },
+    "AC6": {
+      "status": "UNKNOWN",
+      "proof": "Pending project-map sync after public repo URL exists."
+    }
+  }
+}

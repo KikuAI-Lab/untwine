@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file original="demo-rise-course" source-language="en-US" target-language="fr-FR" datatype="x-articulate">
+    <body>
+      <trans-unit id="cat-block-001-title">
+        <source>Welcome <x id="1" ctype="x-bold"/> learner</source>
+        <target>Bienvenue <x id="1" ctype="x-bold"/> apprenant</target>
+      </trans-unit>
+      <trans-unit id="block-002-instruction">
+        <source>Click <g id="2" ctype="x-link">continue</g> when you are ready.</source>
+        <target>Cliquez sur <g id="2" ctype="x-link">continuer</g> lorsque vous etes pret.</target>
+      </trans-unit>
+      <trans-unit id="quiz-001-feedback">
+        <source>Try again and review the safety checklist.</source>
+        <target>Reessayez et consultez la liste de controle de securite.</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
