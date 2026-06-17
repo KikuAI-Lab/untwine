@@ -1,0 +1,11 @@
+priority,target_type,name,url,why_it_matches,approval_needed,note
+1,official-community,E-Learning Heroes Discuss,https://community.articulate.com/discussions/discuss,"Exact public pain threads live here; useful only as helpful replies to relevant questions",yes,"Do not post unless Nick approves. No spam. Disclose affiliation."
+1,official-community,Articulate Rise 360 support docs,https://www.articulatesupport.com/article/Rise-360-Manually-Translate-Your-Content,"Official workflow anchor for Rise XLIFF import/export",no,"Use as source in owned pages."
+1,official-community,Articulate Storyline 360 support docs,https://www.articulatesupport.com/article/Storyline-360-Translating-Courses,"Official workflow anchor for Storyline XLIFF/Word translation",no,"Use as source in owned pages."
+2,search-owned,Fix Rise 360 XLIFF import error page,https://kikuai.dev/fix-articulate-xliff-import-error/,"Current owned page should be tuned to exact error language",no,"Main conversion surface."
+2,github,Project README,https://github.com/KikuAI-Lab/articulate-xliff-import-doctor,"Proof corpus and CLI credibility for technical users",no,"Keep README tight and non-overclaiming."
+2,youtube,Tutorial search: Articulate XLIFF import error,https://www.youtube.com/results?search_query=articulate+xliff+import+error,"Tutorial videos are common in eLearning tooling",yes,"Create own tutorial before asking creators."
+3,community,Instructional Design subreddit,https://www.reddit.com/r/instructionaldesign/,"Audience includes Articulate users, but broad and easy to spam",yes,"Only share after useful tutorial/proof artifact."
+3,blog-category,eLearning localization blogs,https://www.learningguild.com/,"Audience cares about localization workflow",yes,"Pitch as technical troubleshooting resource, not product ad."
+3,localization-tools,Redokun Articulate translation article,https://redokun.com/blog/storyline-360-translation,"Adjacent to Articulate XLIFF workflow; competitor/alternative context",no,"Use for comparison research only unless explicit outreach approved."
+3,translation-platform,Smartcat Articulate Rise localization page,https://www.smartcat.com/articulate-rise-localization/,"Shows platform-level alternative and category vocabulary",no,"Use to position against full translation platforms."

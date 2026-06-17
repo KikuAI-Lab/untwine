@@ -104,6 +104,14 @@ Run:
 npm test
 ```
 
+## Research And Visibility Notes
+
+The current product-validation packet lives under `docs/`:
+
+- `docs/research/articulate-xliff-operator-zero-brief-2026-06-12.md` maps the buyer workflow, website-vs-mobile decision, proof corpus coverage, and trial-account blocker.
+- `docs/research/articulate-xliff-error-phrase-corpus-2026-06-12.csv` maps public Articulate error phrases to current tool verdicts and detector backlog.
+- `docs/marketing/articulate-xliff-import-doctor/` contains the visibility brief, error-page backlog, mention targets, tutorial briefs, outreach drafts, and measurement plan.
+
 ## License
 
 AGPL-3.0-only. See [LICENSE](LICENSE).
