@@ -11,8 +11,8 @@ The tool is intentionally narrow: it does not translate files and it does not pr
 ## Quick Start
 
 ```bash
-git clone https://github.com/KikuAI-Lab/articulate-xliff-import-doctor.git
-cd articulate-xliff-import-doctor
+git clone https://github.com/KikuAI-Lab/untwine.git
+cd untwine
 npm test
 
 node bin/articulate-xliff-doctor.js analyze \

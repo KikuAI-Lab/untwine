@@ -12,7 +12,7 @@ Active validation for a narrow repair/report product. Do not market as a generic
 - Brand: KikuAI.
 - Category: local-first Articulate XLIFF import-error diagnosis and safe repair.
 - Hosted tool: https://kikuai.dev/fix-articulate-xliff-import-error/
-- Repo: https://github.com/KikuAI-Lab/articulate-xliff-import-doctor
+- Repo: https://github.com/KikuAI-Lab/untwine
 
 ## ICP
 

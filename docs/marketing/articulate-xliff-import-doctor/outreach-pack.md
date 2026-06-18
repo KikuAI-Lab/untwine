@@ -18,7 +18,7 @@ I built a small local-first checker for this exact Articulate XLIFF import probl
 It does not translate files and it does not promise to fix every XLIFF. The useful part is getting a quick diagnosis before sending files back to a translator or support.
 
 Tool: https://kikuai.dev/fix-articulate-xliff-import-error/
-Repo / proof corpus: https://github.com/KikuAI-Lab/articulate-xliff-import-doctor
+Repo / proof corpus: https://github.com/KikuAI-Lab/untwine
 ```
 
 ## Creator Pitch

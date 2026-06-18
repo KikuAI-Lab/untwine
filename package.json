@@ -8,10 +8,10 @@
   "homepage": "https://kikuai.dev/fix-articulate-xliff-import-error/",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/KikuAI-Lab/articulate-xliff-import-doctor.git"
+    "url": "git+https://github.com/KikuAI-Lab/untwine.git"
   },
   "bugs": {
-    "url": "https://github.com/KikuAI-Lab/articulate-xliff-import-doctor/issues"
+    "url": "https://github.com/KikuAI-Lab/untwine/issues"
   },
   "bin": {
     "articulate-xliff-doctor": "./bin/articulate-xliff-doctor.js"
