@@ -1,7 +1,7 @@
 {
   "name": "articulate-xliff-import-doctor",
   "version": "0.1.0",
-  "description": "Local-first Articulate Rise and Storyline XLIFF import-error diagnosis and safe repair.",
+  "description": "Untwine: local-first Articulate Rise and Storyline XLIFF import-error diagnosis and safe repair.",
   "type": "module",
   "license": "AGPL-3.0-only",
   "author": "KikuAI OÜ",

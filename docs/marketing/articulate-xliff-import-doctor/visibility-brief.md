@@ -1,4 +1,4 @@
-# Visibility Brief: Articulate XLIFF Import Doctor
+# Visibility Brief: Untwine
 
 Date: 2026-06-12
 
@@ -8,7 +8,7 @@ Active validation for a narrow repair/report product. Do not market as a generic
 
 ## Entity
 
-- Product: Articulate XLIFF Import Doctor.
+- Product: Untwine.
 - Brand: KikuAI.
 - Category: local-first Articulate XLIFF import-error diagnosis and safe repair.
 - Hosted tool: https://kikuai.dev/fix-articulate-xliff-import-error/

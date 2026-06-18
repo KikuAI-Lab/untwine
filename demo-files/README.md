@@ -1,6 +1,6 @@
 # Articulate XLIFF Demo Files
 
-Synthetic demo files for the public Articulate XLIFF Import Doctor page.
+Synthetic demo files for the public Untwine page.
 
 These are not customer files and do not contain proprietary course text.
 

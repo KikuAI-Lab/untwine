@@ -1,4 +1,6 @@
-# Articulate XLIFF Import Doctor
+# Untwine
+
+Articulate XLIFF Import Repair.
 
 Local-first diagnosis and safe repair for Articulate Rise and Storyline XLIFF import failures.
 
@@ -82,10 +84,10 @@ The file objects only need a `name` and either `text()` or `arrayBuffer()`. This
 
 ## Privacy Model
 
-The core runs locally and does not upload file content anywhere. The hosted KikuTools version keeps the same browser-local boundary.
+The core runs locally and does not upload file content anywhere. The hosted Untwine page keeps the same browser-local boundary.
 
 Hosted tool:
-[Fix Articulate import errors](https://kikuai.dev/fix-articulate-xliff-import-error/)
+[Untwine - Articulate XLIFF Import Repair](https://kikuai.dev/fix-articulate-xliff-import-error/)
 
 ## Limits
 

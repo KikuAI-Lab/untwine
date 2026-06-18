@@ -6,7 +6,7 @@ No outreach is approved by this file. It is a draft pack for later use only.
 
 ## One-Sentence Product Description
 
-Articulate XLIFF Import Doctor checks original and translated Rise/Storyline XLIFF files locally, diagnoses import blockers, and safely repairs only the file-level issues that can be fixed without changing translated text.
+Untwine checks original and translated Rise/Storyline XLIFF files locally, diagnoses import blockers, and safely repairs only the file-level issues that can be fixed without changing translated text.
 
 ## Short Helpful Community Reply
 
@@ -26,7 +26,7 @@ Repo / proof corpus: https://github.com/KikuAI-Lab/articulate-xliff-import-docto
 ```text
 I noticed many Rise/Storyline users hit the same XLIFF import failures after translation: course mismatch, check formatting/re-export, missing targets, changed IDs, or imports that succeed but do not change the course.
 
-I built a small browser-local Articulate XLIFF Import Doctor. It does not translate. It checks an original + translated file pair and shows whether the issue is clean, safely repairable, manual-review, unrepairable, or unsupported.
+I built a small browser-local tool called Untwine. It does not translate. It checks an original + translated file pair and shows whether the issue is clean, safely repairable, manual-review, unrepairable, or unsupported.
 
 If you ever make troubleshooting videos for Articulate localization workflows, I can provide synthetic demo files and a proof corpus so you do not need to use customer content.
 ```
@@ -47,4 +47,3 @@ If you ever make troubleshooting videos for Articulate localization workflows, I
 - Do not claim the tool fixes every XLIFF.
 - Do not ask users to send private customer files.
 - Do not promise mobile support as a key surface.
-
