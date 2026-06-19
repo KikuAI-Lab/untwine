@@ -1,0 +1,129 @@
+{
+  "version": 1,
+  "updatedAt": "2026-06-18",
+  "product": "Untwine",
+  "scope": "Articulate-style original plus translated XLIFF 1.2 file pairs.",
+  "decision": "Only deterministic metadata-preserving repair classes may emit a repaired XLIFF. Anything that changes translated target text, changes trans-unit count, changes protected inline signatures, changes XLIFF version, or requires semantic judgement is diagnosis-only or rejected.",
+  "safeRepairClasses": [
+    {
+      "id": "remove_bom",
+      "action": "safe_repair",
+      "allowedWhen": "A UTF-8 BOM appears before the XML declaration.",
+      "mustNotChange": ["element order", "source text", "target text", "inline tags"]
+    },
+    {
+      "id": "normalize_xml_encoding_declaration",
+      "action": "safe_repair",
+      "allowedWhen": "The XML declaration advertises a non-UTF-8 encoding while the payload is already readable as text.",
+      "mustNotChange": ["element order", "source text", "target text", "inline tags"]
+    },
+    {
+      "id": "restore_trans_unit_id",
+      "action": "safe_repair",
+      "allowedWhen": "Original and translated trans-unit counts match, unit order matches, and only missing or changed translated trans-unit id attributes differ.",
+      "mustNotChange": ["source text", "target text", "inline tags", "trans-unit count"]
+    }
+  ],
+  "categoryPolicy": [
+    {
+      "category": "encoding_bom",
+      "defaultAction": "safe_repair",
+      "reason": "Leading BOM removal is byte-local and does not affect translated content."
+    },
+    {
+      "category": "encoding_declaration_mismatch",
+      "defaultAction": "safe_repair",
+      "reason": "The declaration value can be normalized without touching XML content."
+    },
+    {
+      "category": "changed_trans_unit_id",
+      "defaultAction": "safe_repair",
+      "reason": "The original id can be restored only when the pair still has matching order and count."
+    },
+    {
+      "category": "missing_trans_unit_id",
+      "defaultAction": "conditional",
+      "reason": "Missing id is repairable only when the translated file still has the same trans-unit count and order. Missing or extra units are unrepairable."
+    },
+    {
+      "category": "missing_target",
+      "defaultAction": "manual_review",
+      "reason": "Creating target text is translation work and cannot be inferred safely."
+    },
+    {
+      "category": "source_target_tag_count_drift",
+      "defaultAction": "manual_review",
+      "reason": "Tag-count drift can corrupt translated content or Articulate protected markup."
+    },
+    {
+      "category": "protected_inline_tag_rewrite",
+      "defaultAction": "manual_review",
+      "reason": "Inline tag rewrites must not be auto-corrected without real file proof."
+    },
+    {
+      "category": "namespace_version_drift",
+      "defaultAction": "unrepairable",
+      "reason": "The translated file no longer matches the original XLIFF 1.2 namespace/version contract."
+    },
+    {
+      "category": "malformed_xml",
+      "defaultAction": "unsupported",
+      "reason": "Broken XML must be fixed before structural XLIFF comparison can be trusted."
+    },
+    {
+      "category": "invalid_entities",
+      "defaultAction": "unsupported",
+      "reason": "Unknown entity repair can change text meaning or hide broader XML corruption."
+    },
+    {
+      "category": "wrong_wrapper",
+      "defaultAction": "unsupported",
+      "reason": "Non-XLIFF XML is outside the product scope."
+    },
+    {
+      "category": "unsupported_xliff_version",
+      "defaultAction": "unsupported",
+      "reason": "XLIFF 1.0 and 2.0 require separate diagnosis contracts before support."
+    },
+    {
+      "category": "wrong_extension",
+      "defaultAction": "unsupported",
+      "reason": "Articulate import expects .xlf or .xliff upload files."
+    }
+  ],
+  "proofCorpusCasePolicy": [
+    { "caseId": "valid-clean-xliff12", "expectedAction": "clean" },
+    { "caseId": "changed-id-safe-repair", "expectedAction": "safe_repair" },
+    { "caseId": "missing-id-safe-repair", "expectedAction": "safe_repair" },
+    { "caseId": "encoding-declaration-safe-repair", "expectedAction": "safe_repair" },
+    { "caseId": "bom-plus-encoding-safe-repair", "expectedAction": "safe_repair" },
+    { "caseId": "missing-target-manual-review", "expectedAction": "manual_review" },
+    { "caseId": "inline-tag-count-drift-manual-review", "expectedAction": "manual_review" },
+    { "caseId": "mrk-segmentation-drift-manual-review", "expectedAction": "manual_review" },
+    { "caseId": "protected-inline-rewrite-manual-review", "expectedAction": "manual_review" },
+    { "caseId": "namespace-drift-unrepairable", "expectedAction": "unrepairable" },
+    { "caseId": "missing-trans-unit-unrepairable", "expectedAction": "unrepairable" },
+    { "caseId": "extra-trans-unit-unrepairable", "expectedAction": "unrepairable" },
+    { "caseId": "malformed-xml-unsupported", "expectedAction": "unsupported" },
+    { "caseId": "invalid-entity-unsupported", "expectedAction": "unsupported" },
+    { "caseId": "wrong-wrapper-unsupported", "expectedAction": "unsupported" },
+    { "caseId": "xliff20-unsupported", "expectedAction": "unsupported" },
+    { "caseId": "xliff10-unsupported", "expectedAction": "unsupported" },
+    { "caseId": "wrong-extension-unsupported", "expectedAction": "unsupported" },
+    { "caseId": "combined-safe-repairs", "expectedAction": "safe_repair" }
+  ],
+  "blockedUntilProof": [
+    {
+      "capability": "XLIFF 2.0 diagnosis",
+      "requiredProof": "Separate fixture corpus and diagnosis-only copy. No repair writer until real Articulate files prove stable signatures."
+    },
+    {
+      "capability": "single-file diagnosis",
+      "requiredProof": "Separate product promise and fixtures that do not imply safe repair without original file comparison."
+    },
+    {
+      "capability": "inline tag auto-repair",
+      "requiredProof": "Real safely repairable files plus roundtrip tests that preserve target text and Articulate import signatures."
+    }
+  ]
+}
