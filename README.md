@@ -1,28 +1,55 @@
 # Untwine
 
-Articulate XLIFF Import Repair.
+Untwine is a local-first CLI and library for diagnosing and safely repairing Articulate Rise/Storyline XLIFF import failures.
 
-Local-first diagnosis and safe repair for Articulate Rise and Storyline XLIFF import failures.
+**[Run the demo repair](#quickstart)**
+
+[Hosted tool](https://kikuai.dev/fix-articulate-xliff-import-error/) · [Safe repairs](#safe-repairs) · [Test corpus](#test-corpus)
 
 Use it when you exported an original `.xlf`, translated it in a CAT tool, and Articulate refuses to import it back because the translated file no longer matches the course structure.
 
 The tool is intentionally narrow: it does not translate files and it does not promise to fix every XLIFF. It compares the original and translated XLIFF 1.2 files, reports likely import blockers, and only rewrites metadata that can be repaired deterministically without changing translated text.
 
-## Quick Start
+## Quickstart
 
 ```bash
 git clone https://github.com/KikuAI-Lab/untwine.git
 cd untwine
 npm test
+```
 
+Analyze a repairable demo file:
+
+```bash
 node bin/articulate-xliff-doctor.js analyze \
   demo-files/demo-articulate-original.xlf \
   demo-files/demo-articulate-translated-safe-repair.xlf
+```
 
+Expected result:
+
+```text
+Verdict: repairable
+Critical issues: 1
+Total issues: 2
+```
+
+The analyzer exits non-zero when it finds critical issues. That is expected for this demo fixture.
+
+Write the repaired file:
+
+```bash
 node bin/articulate-xliff-doctor.js repair \
   demo-files/demo-articulate-original.xlf \
   demo-files/demo-articulate-translated-safe-repair.xlf \
   --out demo-files/demo-articulate-translated-safe-repair.repaired.xlf
+```
+
+Expected result:
+
+```text
+Wrote repaired XLIFF: demo-files/demo-articulate-translated-safe-repair.repaired.xlf
+Critical issues after repair: 0
 ```
 
 If you install or link the package locally, the same CLI is available as `articulate-xliff-doctor`.
