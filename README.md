@@ -6,6 +6,8 @@ Untwine is a local-first CLI and library for diagnosing and safely repairing Art
 
 [Docs](#what-is-in-this-repo) · [Examples](#quickstart) · [Safe repairs](#safe-repairs)
 
+![Untwine local Articulate XLIFF import diagnostics interface](docs/assets/readme-screenshot.png)
+
 Sample output:
 
 ```text
