@@ -2,6 +2,7 @@
 
 Untwine is a local-first CLI and library for diagnosing and safely repairing Articulate Rise/Storyline XLIFF import failures.
 
+**[Open the browser-local tool](https://kikuai.dev/fix-articulate-xliff-import-error/)** ·
 **[Run the demo repair](#quickstart)**
 
 [Docs](#what-is-in-this-repo) · [Examples](#quickstart) · [Safe repairs](#safe-repairs)
@@ -150,6 +151,12 @@ The current product-validation packet lives under `docs/`:
 - `docs/research/articulate-xliff-operator-zero-brief-2026-06-12.md` maps the buyer workflow, website-vs-mobile decision, proof corpus coverage, and trial-account blocker.
 - `docs/research/articulate-xliff-error-phrase-corpus-2026-06-12.csv` maps public Articulate error phrases to current tool verdicts and detector backlog.
 - `docs/marketing/articulate-xliff-import-doctor/` contains the visibility brief, error-page backlog, mention targets, tutorial briefs, outreach drafts, and measurement plan.
+
+## Follow the work
+
+Project notes and new tools: [Telegram](https://t.me/kiku_ai) ·
+[LinkedIn](https://www.linkedin.com/in/kiku-jw/) ·
+[KikuAI](https://kikuai.dev/)
 
 ## License
 
