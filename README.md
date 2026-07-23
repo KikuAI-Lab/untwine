@@ -5,7 +5,7 @@ Untwine is a local-first CLI and library for diagnosing and safely repairing Art
 **[Open the browser-local tool](https://kikuai.dev/fix-articulate-xliff-import-error/)** ·
 **[Run the demo repair](#quickstart)**
 
-[Docs](#what-is-in-this-repo) · [Examples](#quickstart) · [Safe repairs](#safe-repairs)
+[What it catches](#what-it-catches) · [Examples](#quickstart) · [Safe repairs](#safe-repairs)
 
 ![Untwine local Articulate XLIFF import diagnostics interface](docs/assets/readme-screenshot.png)
 
