@@ -47,8 +47,8 @@ Evidence:
 PASS.
 
 Evidence:
-- Repository URL: `https://github.com/KikuAI-Lab/articulate-xliff-import-doctor`
-- Fresh command: `gh repo view KikuAI-Lab/articulate-xliff-import-doctor --json name,visibility,url,isPrivate`
+- Repository URL: `https://github.com/KikuAI-Lab/untwine`
+- Fresh command: `gh repo view KikuAI-Lab/untwine --json name,visibility,url,isPrivate`
 - Result: `visibility=PUBLIC`, `isPrivate=false`.
 - Branch `main` tracks `origin/main`.
 
