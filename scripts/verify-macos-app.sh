@@ -43,11 +43,11 @@ cmp "$repo_root/src/xml.js" "$web_root/engine/xml.js"
 node --check "$web_root/app.js"
 node --check "$web_root/engine-runtime.js"
 node --check "$web_root/demo-data.js"
-rg -F '<script src="./engine-runtime.js"></script>' "$web_root/index.html" >/dev/null
-rg -F '<script src="./demo-data.js"></script>' "$web_root/index.html" >/dev/null
-rg -F '<script src="./app.js"></script>' "$web_root/index.html" >/dev/null
-rg -F 'window.untwineAppReady = true;' "$web_root/app.js" >/dev/null
-rg -F 'messageHandlers?.untwineReady?.postMessage' "$web_root/app.js" >/dev/null
+grep -Fq -- '<script src="./engine-runtime.js"></script>' "$web_root/index.html"
+grep -Fq -- '<script src="./demo-data.js"></script>' "$web_root/index.html"
+grep -Fq -- '<script src="./app.js"></script>' "$web_root/index.html"
+grep -Fq -- 'window.untwineAppReady = true;' "$web_root/app.js"
+grep -Fq -- 'messageHandlers?.untwineReady?.postMessage' "$web_root/app.js"
 node "$repo_root/scripts/verify-macos-engine-runtime.mjs" "$web_root/engine-runtime.js"
 
 verification_root="$(mktemp -d)"
@@ -66,7 +66,7 @@ entitlements_output="$(codesign -d --entitlements :- "$verification_app" 2>&1)"
 
 # WKWebView requires the network-client sandbox capability even for bundled
 # content. Keep the shipped interface free of remote URLs and upload calls.
-if rg -n 'https?://' "$web_root" >/dev/null; then
+if grep -ERn -- 'https?://' "$web_root" >/dev/null; then
   echo "Unexpected remote URL in the bundled web interface." >&2
   exit 1
 fi
@@ -76,7 +76,7 @@ if [[ -z "$architectures" ]]; then
   echo "No executable architectures found." >&2
   exit 1
 fi
-if otool -L "$binary" | rg -i 'electron|node|tauri' >/dev/null; then
+if otool -L "$binary" | grep -Eiq -- 'electron|node|tauri'; then
   echo "Unexpected desktop runtime dependency found." >&2
   exit 1
 fi
