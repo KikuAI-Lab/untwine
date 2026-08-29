@@ -238,6 +238,8 @@ function comparePair(original, translated, issues) {
     );
   }
 
+  compareEmptyDefaultNamespaceAttributes(original, translated, issues);
+
   if (original.transUnits.length !== translated.transUnits.length) {
     issues.push(
       issue("missing_trans_unit_id", "critical", "The translated file has a different number of trans-unit records.", {
@@ -249,6 +251,72 @@ function comparePair(original, translated, issues) {
   const unitCount = Math.min(original.transUnits.length, translated.transUnits.length);
   for (let index = 0; index < unitCount; index += 1) {
     compareUnit(original.transUnits[index], translated.transUnits[index], index, issues);
+  }
+}
+
+function compareEmptyDefaultNamespaceAttributes(original, translated, issues) {
+  const originalMatches = emptyDefaultNamespaceAttributeMatches(original);
+  const translatedMatches = emptyDefaultNamespaceAttributeMatches(translated);
+
+  if (translatedMatches.length === 0 || originalMatches.length > 0) {
+    return;
+  }
+
+  for (const match of translatedMatches) {
+    issues.push(
+      issue(
+        "empty_default_namespace_attribute",
+        "critical",
+        "The translated file contains an empty XML namespace attribute added inside translatable content.",
+        {
+          role: "translated",
+          unitIndex: match.unitIndex,
+          repairClass: "remove_empty_default_namespace_attribute",
+          repairData: {
+            start: match.start,
+            end: match.end,
+            replacement: "",
+            from: match.text,
+            to: ""
+          }
+        }
+      )
+    );
+  }
+}
+
+function emptyDefaultNamespaceAttributeMatches(file) {
+  const matches = [];
+
+  for (let unitIndex = 0; unitIndex < file.transUnits.length; unitIndex += 1) {
+    const unit = file.transUnits[unitIndex];
+    for (const localName of ["source", "target"]) {
+      const contentNode = childElement(unit, localName);
+      if (!contentNode) {
+        continue;
+      }
+      collectEmptyDefaultNamespaceAttributes(contentNode, file.text, unitIndex, matches);
+    }
+  }
+
+  return matches;
+}
+
+function collectEmptyDefaultNamespaceAttributes(node, text, unitIndex, matches) {
+  const namespace = attrMeta(node, "xmlns");
+  if (namespace?.name === "xmlns" && namespace.value === "") {
+    matches.push({
+      start: namespace.start,
+      end: namespace.end,
+      text: text.slice(namespace.start, namespace.end),
+      unitIndex
+    });
+  }
+
+  for (const child of node.children ?? []) {
+    if (child.type === "element") {
+      collectEmptyDefaultNamespaceAttributes(child, text, unitIndex, matches);
+    }
   }
 }
 
@@ -484,6 +552,16 @@ function sampleDiff(issues) {
       description: "Normalize XML declaration encoding to UTF-8.",
       before: "encoding is not UTF-8",
       after: 'encoding="UTF-8"'
+    };
+  }
+
+  const emptyNamespace = issues.find((item) => item.category === "empty_default_namespace_attribute");
+  if (emptyNamespace) {
+    return {
+      repairClass: "remove_empty_default_namespace_attribute",
+      description: "Remove empty XML namespace attributes added inside translated content nodes.",
+      before: 'xmlns=""',
+      after: "removed"
     };
   }
 

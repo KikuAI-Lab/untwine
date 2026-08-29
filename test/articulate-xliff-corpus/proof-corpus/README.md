@@ -9,8 +9,15 @@ It is intentionally separate from unit-test fixtures. Unit fixtures prove small 
 - valid Articulate-like XLIFF 1.2 pair;
 - missing or changed `trans-unit` IDs;
 - encoding declaration mismatch and UTF-8 BOM;
+- empty default namespace attributes added by translation tools;
 - missing `target`;
 - protected inline tag count drift;
+- explicit XLIFF 1.2 protected inline family preservation and rewrite drift:
+  - standalone `x`;
+  - span `g`;
+  - paired `bx` / `ex`;
+  - placeholder `ph`;
+  - paired native-code `bpt` / `ept`;
 - CAT-tool `<mrk>` segmentation drift inside translated targets;
 - protected inline tag rewrite with matching tag count;
 - namespace/version drift;
@@ -31,6 +38,12 @@ These are likely high-value cases from the SERP research, but they should not be
 - Storyline XLIFF 2.0 structural validation beyond clear unsupported messaging;
 - split/merged translation segments.
 
-The corpus now includes a synthetic `<mrk>`-wrapped target that the current analyzer can classify honestly as manual-review-only structure drift. What remains uncovered is any claim that `<mrk>` cleanup is safely repairable.
+The corpus now includes:
+
+- a synthetic `<mrk>`-wrapped target that the current analyzer can classify honestly as manual-review-only structure drift;
+- a synthetic/redacted empty `xmlns=""` case derived from a public Storyline support thread, which the analyzer can safely repair without rewriting translated text;
+- synthetic inline-family fixtures inspired by GitHub/NPM XLIFF reference projects. These prove protected tag signature comparison across common XLIFF 1.2 inline families without adding a runtime dependency.
+
+What remains uncovered is any claim that `<mrk>` cleanup is safely repairable.
 
 Add these as proof cases only when the analyzer can classify them honestly without pretending to repair translated text semantics.

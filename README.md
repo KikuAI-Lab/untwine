@@ -1,8 +1,9 @@
 # Untwine
 
-Untwine is a local-first CLI and library for diagnosing and safely repairing Articulate Rise/Storyline XLIFF import failures.
+Untwine is a local-first Mac app, CLI, and JavaScript library for diagnosing and safely repairing Articulate Rise/Storyline XLIFF import failures.
 
 **[Open the browser-local tool](https://kikuai.dev/fix-articulate-xliff-import-error/)** ·
+**[Build Untwine for Mac](#untwine-for-mac)** ·
 **[Run the demo repair](#quickstart)**
 
 [What it catches](#what-it-catches) · [Examples](#quickstart) · [Safe repairs](#safe-repairs)
@@ -70,6 +71,23 @@ npm link
 articulate-xliff-doctor analyze original.xlf translated.xlf --json
 ```
 
+## Untwine for Mac
+
+The macOS app puts the same conservative repair engine behind drag-and-drop file selection, a visual diagnosis, and native save panels. Course text stays inside the app; there is no account, telemetry, upload, or translation service.
+
+Requirements: macOS 13 or later, Node.js 20 or later, and the Swift toolchain included with Xcode or Xcode Command Line Tools.
+
+```bash
+npm test
+npm run build:macos
+npm run verify:macos
+open dist/Untwine.app
+```
+
+The default build is a universal `arm64` + `x86_64` app. It is sandboxed and ad-hoc signed for local development. Developer ID/App Store signing, notarization, and distribution remain separate release steps.
+
+See the maintained [Mac architecture and privacy boundary](docs/architecture/macos-app.md).
+
 ## What It Catches
 
 - wrong file extension for an XLIFF upload
@@ -83,6 +101,7 @@ articulate-xliff-doctor analyze original.xlf translated.xlf --json
 - source/target inline tag count drift
 - protected inline tag rewrites
 - UTF-8 BOM and XML encoding declaration issues
+- empty default namespace attributes introduced inside translated source/target content
 
 ## Safe Repairs
 
@@ -91,6 +110,7 @@ The current repair engine is conservative. It can safely:
 - remove a UTF-8 BOM
 - normalize the XML declaration to UTF-8
 - restore missing or changed translated `trans-unit` ids when the original and translated unit order still matches
+- remove empty `xmlns=""` attributes only inside translated `source` or `target` subtrees
 
 It blocks repairs when the file needs human review or when an automated edit could corrupt translated content.
 
@@ -122,7 +142,7 @@ The file objects only need a `name` and either `text()` or `arrayBuffer()`. This
 
 ## Privacy Model
 
-The core runs locally and does not upload file content anywhere. The hosted Untwine page keeps the same browser-local boundary.
+The core runs locally and does not upload file content anywhere. The hosted Untwine page keeps the same browser-local boundary. The sandboxed Mac shell uses WebKit's required network-client capability, but the shipped interface contains no remote URL, request, analytics, or upload code; the package verifier enforces that boundary.
 
 Hosted tool:
 [Untwine - Articulate XLIFF Import Repair](https://kikuai.dev/fix-articulate-xliff-import-error/)
@@ -133,16 +153,23 @@ Hosted tool:
 - Built for Articulate-style original/translated file pairs.
 - Not a CAT tool, TMS, translator, or generic XLIFF validator.
 - Manual review is still required when target text, inline tags, segmentation, or course structure were materially changed.
+- Storyline XLIFF 2.0 is detected and rejected with an explicit unsupported result.
 
 ## Test Corpus
 
-The repository includes a public proof corpus under `test/articulate-xliff-corpus/` with clean, repairable, manual-review, unrepairable, and unsupported cases.
+The repository includes a 22-case public proof corpus under `test/articulate-xliff-corpus/` with clean, repairable, manual-review, unrepairable, and unsupported cases.
 
 Run:
 
 ```bash
 npm test
 ```
+
+## Release Readiness
+
+The engine, universal Mac package, bundled demo, native save flow, and repaired-file roundtrip have automated or local-device proof. Untwine should not be sold as Articulate-compatible yet: the remaining product gate is one real or trial-generated Rise/Storyline export, repair, and successful re-import into the exact source course.
+
+Commercial terms are also intentionally unset while the repository remains AGPL-3.0-only. See the existing [license decision memo](docs/architecture/license-decision-2026-06-18.md).
 
 ## Research And Visibility Notes
 

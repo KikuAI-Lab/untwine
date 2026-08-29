@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file original="inline-family.story" source-language="en-US" target-language="fr-FR" datatype="x-articulate">
+    <body>
+      <trans-unit id="inline-x">
+        <source>Press <x id="x1" ctype="x-button"/> now</source>
+        <target>Press <x id="x1" ctype="x-button"/> now</target>
+      </trans-unit>
+      <trans-unit id="inline-g">
+        <source>Open <g id="g1" ctype="x-link">settings</g>.</source>
+        <target>Open <g id="g1" ctype="x-link">settings</g>.</target>
+      </trans-unit>
+      <trans-unit id="inline-bx-ex">
+        <source>Choose <bx id="bx1" rid="span1" ctype="x-italic"/>carefully<ex id="ex1" rid="span1"/> today</source>
+        <target>Choose <bx id="bx1" rid="span1" ctype="x-italic"/>carefully<ex id="ex1" rid="span1"/> today</target>
+      </trans-unit>
+      <trans-unit id="inline-ph">
+        <source>Line one<ph id="ph1" ctype="lb" equiv-text="&lt;br/&gt;">&lt;br/&gt;</ph>line two</source>
+        <target>Line one<ph id="ph1" ctype="lb" equiv-text="&lt;br/&gt;">&lt;br/&gt;</ph>line two</target>
+      </trans-unit>
+      <trans-unit id="inline-bpt-ept">
+        <source><bpt id="bpt1" rid="native1" ctype="x-bold">&lt;strong&gt;</bpt>Important<ept id="ept1" rid="native1">&lt;/strong&gt;</ept></source>
+        <target><bpt id="bpt1" rid="native1" ctype="x-bold">&lt;strong&gt;</bpt>Important<ept id="ept1" rid="native1">&lt;/strong&gt;</ept></target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

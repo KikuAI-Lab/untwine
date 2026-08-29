@@ -18,6 +18,12 @@
       "mustNotChange": ["element order", "source text", "target text", "inline tags"]
     },
     {
+      "id": "remove_empty_default_namespace_attribute",
+      "action": "safe_repair",
+      "allowedWhen": "The translated XLIFF 1.2 file adds xmlns=\"\" inside source or target content while the original pair has no such attributes.",
+      "mustNotChange": ["element order", "source text", "target text", "inline tags"]
+    },
+    {
       "id": "restore_trans_unit_id",
       "action": "safe_repair",
       "allowedWhen": "Original and translated trans-unit counts match, unit order matches, and only missing or changed translated trans-unit id attributes differ.",
@@ -34,6 +40,11 @@
       "category": "encoding_declaration_mismatch",
       "defaultAction": "safe_repair",
       "reason": "The declaration value can be normalized without touching XML content."
+    },
+    {
+      "category": "empty_default_namespace_attribute",
+      "defaultAction": "safe_repair",
+      "reason": "A real public Storyline case was fixed by removing empty namespace resets added inside translatable content; removal is limited to source and target subtrees."
     },
     {
       "category": "changed_trans_unit_id",
@@ -97,10 +108,13 @@
     { "caseId": "missing-id-safe-repair", "expectedAction": "safe_repair" },
     { "caseId": "encoding-declaration-safe-repair", "expectedAction": "safe_repair" },
     { "caseId": "bom-plus-encoding-safe-repair", "expectedAction": "safe_repair" },
+    { "caseId": "empty-default-xmlns-safe-repair", "expectedAction": "safe_repair" },
     { "caseId": "missing-target-manual-review", "expectedAction": "manual_review" },
     { "caseId": "inline-tag-count-drift-manual-review", "expectedAction": "manual_review" },
     { "caseId": "mrk-segmentation-drift-manual-review", "expectedAction": "manual_review" },
     { "caseId": "protected-inline-rewrite-manual-review", "expectedAction": "manual_review" },
+    { "caseId": "inline-families-clean-xliff12", "expectedAction": "clean" },
+    { "caseId": "inline-families-rewrite-manual-review", "expectedAction": "manual_review" },
     { "caseId": "namespace-drift-unrepairable", "expectedAction": "unrepairable" },
     { "caseId": "missing-trans-unit-unrepairable", "expectedAction": "unrepairable" },
     { "caseId": "extra-trans-unit-unrepairable", "expectedAction": "unrepairable" },

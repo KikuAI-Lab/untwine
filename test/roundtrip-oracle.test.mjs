@@ -47,20 +47,20 @@ function transUnitIds(xmlText) {
 
 test("safe repair roundtrip preserves target text and inline signatures", async () => {
   const manifest = JSON.parse(await readCorpus("proof-corpus/manifest.json"));
-  const originalText = await readCorpus(manifest.defaultOriginal);
-  const originalIds = transUnitIds(originalText);
   const safeCases = manifest.cases.filter((item) => item.expected.repairability === "repairable");
 
   assert.ok(safeCases.length > 0);
 
   for (const item of safeCases) {
+    const originalText = await readCorpus(item.original || manifest.defaultOriginal);
+    const originalIds = transUnitIds(originalText);
     const translatedBase = await readCorpus(item.translated);
     const translatedText = item.prependBom ? `\uFEFF${translatedBase}` : translatedBase;
     const translatedName = item.translatedFileName || path.basename(item.translated);
     const beforeTargets = targetProfiles(translatedText);
 
     const repairResult = await repair([
-      virtualFile("valid-original.xlf", originalText),
+      virtualFile(item.original ? path.basename(item.original) : "valid-original.xlf", originalText),
       virtualFile(translatedName, translatedText)
     ]);
 
@@ -69,7 +69,7 @@ test("safe repair roundtrip preserves target text and inline signatures", async 
     assert.deepEqual(transUnitIds(repairResult.text), originalIds, `${item.id}: original ids restored`);
 
     const repairedPreview = await analyze([
-      virtualFile("valid-original.xlf", originalText),
+      virtualFile(item.original ? path.basename(item.original) : "valid-original.xlf", originalText),
       virtualFile(translatedName, repairResult.text)
     ]);
     assert.equal(repairedPreview.summary.criticalIssues, 0, `${item.id}: repaired pair has no critical issues`);

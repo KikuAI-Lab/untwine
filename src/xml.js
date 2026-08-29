@@ -283,6 +283,7 @@ function parseStartTag(rawTag, absoluteStart, openTagEnd) {
   const attrs = [];
   let selfClosing = false;
   while (cursor < rawTag.length) {
+    const separatorStart = cursor;
     cursor = skipWhitespace(rawTag, cursor);
     if (cursor >= rawTag.length) {
       break;
@@ -328,6 +329,8 @@ function parseStartTag(rawTag, absoluteStart, openTagEnd) {
       name: attrName,
       localName: localName(attrName),
       value: decodeEntities(rawValue, absoluteStart + valueStart),
+      start: absoluteStart + separatorStart,
+      end: absoluteStart + cursor + 1,
       valueStart: absoluteStart + valueStart,
       valueEnd: absoluteStart + cursor
     });

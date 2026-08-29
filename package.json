@@ -27,8 +27,10 @@
     "LICENSE"
   ],
   "scripts": {
+    "build:macos": "./scripts/build-macos-app.sh",
     "check": "npm test",
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/*.test.mjs",
+    "verify:macos": "./scripts/verify-macos-app.sh"
   },
   "engines": {
     "node": ">=20"

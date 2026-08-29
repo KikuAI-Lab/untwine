@@ -69,6 +69,19 @@
       }
     },
     {
+      "id": "empty-default-xmlns-safe-repair",
+      "title": "CAT tool added empty default namespace attributes",
+      "translated": "proof-corpus/files/empty-xmlns-translated.xlf",
+      "expected": {
+        "ok": false,
+        "repairability": "repairable",
+        "categories": ["empty_default_namespace_attribute"],
+        "unsupportedCode": null,
+        "repairOk": true,
+        "remainingCriticalAfterRepair": 0
+      }
+    },
+    {
       "id": "missing-target-manual-review",
       "title": "Translated unit is missing target element",
       "translated": "test/fixtures/missing-target-translated.xlf",
@@ -108,6 +121,32 @@
       "id": "protected-inline-rewrite-manual-review",
       "title": "Protected inline tag ID was rewritten while tag count stayed equal",
       "translated": "proof-corpus/files/protected-inline-rewrite-translated.xlf",
+      "expected": {
+        "ok": false,
+        "repairability": "manual_review",
+        "categories": ["protected_inline_tag_rewrite"],
+        "unsupportedCode": null,
+        "repairOk": false
+      }
+    },
+    {
+      "id": "inline-families-clean-xliff12",
+      "title": "XLIFF 1.2 inline tag families are preserved",
+      "original": "proof-corpus/files/inline-families-original.xlf",
+      "translated": "proof-corpus/files/inline-families-clean-translated.xlf",
+      "expected": {
+        "ok": true,
+        "repairability": "clean",
+        "categories": [],
+        "unsupportedCode": null,
+        "repairOk": true
+      }
+    },
+    {
+      "id": "inline-families-rewrite-manual-review",
+      "title": "XLIFF 1.2 inline tag family signatures drift while tag count stays equal",
+      "original": "proof-corpus/files/inline-families-original.xlf",
+      "translated": "proof-corpus/files/inline-families-rewrite-translated.xlf",
       "expected": {
         "ok": false,
         "repairability": "manual_review",

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <title>Untwine</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand" aria-label="Untwine for Mac">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span>Untwine</span>
+          <span class="brand-platform">for Mac</span>
+        </div>
+        <div class="privacy-pill"><span aria-hidden="true">●</span> Local-only processing</div>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="page-title">
+          <p class="eyebrow">Articulate XLIFF 1.2 doctor</p>
+          <h1 id="page-title">Find the import blocker.<br>Repair only what is safe.</h1>
+          <p class="hero-copy">
+            Compare the untouched Articulate export with the translated file. Untwine diagnoses structural drift and creates a repaired copy only when translated text can remain unchanged.
+          </p>
+          <div class="scope-row" aria-label="Product scope">
+            <span>Rise 360</span>
+            <span>Storyline 360 XLIFF 1.2</span>
+            <span>No upload</span>
+          </div>
+        </section>
+
+        <section class="workspace" aria-labelledby="workspace-title">
+          <div class="workspace-heading">
+            <div>
+              <p class="step-label">File pair</p>
+              <h2 id="workspace-title">Choose the exact original and translated files</h2>
+            </div>
+            <button class="button button-quiet" id="demoButton" type="button">Use safe demo</button>
+          </div>
+
+          <div class="file-grid">
+            <label class="file-card" id="originalDropzone" for="originalFile">
+              <input id="originalFile" type="file" accept=".xlf,.xliff,application/xliff+xml" hidden>
+              <span class="file-step">1</span>
+              <span class="file-icon" aria-hidden="true">↑</span>
+              <strong>Original export</strong>
+              <span class="file-help">The untouched XLF/XLIFF exported from the exact course.</span>
+              <span class="file-choice" id="originalChoice">Choose original file</span>
+            </label>
+
+            <label class="file-card" id="translatedDropzone" for="translatedFile">
+              <input id="translatedFile" type="file" accept=".xlf,.xliff,application/xliff+xml" hidden>
+              <span class="file-step">2</span>
+              <span class="file-icon" aria-hidden="true">↑</span>
+              <strong>Translated file</strong>
+              <span class="file-help">The file returned by your translator or CAT tool.</span>
+              <span class="file-choice" id="translatedChoice">Choose translated file</span>
+            </label>
+          </div>
+
+          <div class="action-row">
+            <p id="pairStatus" role="status">Add both files to begin.</p>
+            <button class="button button-primary" id="analyzeButton" type="button" disabled>Analyze pair</button>
+          </div>
+        </section>
+
+        <section class="result-panel" id="resultPanel" aria-live="polite" hidden>
+          <div class="result-summary">
+            <div class="result-state" id="resultState">Result</div>
+            <div>
+              <h2 id="resultTitle">Diagnosis</h2>
+              <p id="resultBody"></p>
+            </div>
+            <div class="result-counts" aria-label="Issue counts">
+              <span><strong id="criticalCount">0</strong> critical</span>
+              <span><strong id="totalCount">0</strong> total</span>
+            </div>
+          </div>
+
+          <div class="result-details">
+            <div>
+              <p class="step-label">What Untwine found</p>
+              <ul class="issue-list" id="issueList"></ul>
+            </div>
+            <div class="next-action">
+              <p class="step-label">Safe output</p>
+              <p id="outputHint">Save a privacy-safe diagnosis report.</p>
+              <div class="button-stack">
+                <button class="button button-primary" id="repairButton" type="button" hidden>Save repaired copy</button>
+                <button class="button button-secondary" id="reportButton" type="button">Save diagnosis report</button>
+                <button class="button button-quiet" id="resetButton" type="button">Check another pair</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <p>Your course text stays inside this app. Untwine has no account, analytics, cloud upload, or translation engine.</p>
+        <p>Current boundary: Articulate-style XLIFF 1.2 pairs. A clean or repaired result is not a guarantee that Articulate will accept the import.</p>
+      </footer>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+    <script src="./engine-runtime.js"></script>
+    <script src="./demo-data.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>

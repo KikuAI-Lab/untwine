@@ -1,0 +1,37 @@
+name: Verify
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - run: npm test
+
+  macos-app:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: Build the runner architecture
+        shell: bash
+        run: |
+          case "$RUNNER_ARCH" in
+            ARM64) export UNTWINE_MAC_ARCHS=arm64 ;;
+            X64) export UNTWINE_MAC_ARCHS=x86_64 ;;
+            *) echo "Unsupported runner architecture: $RUNNER_ARCH" >&2; exit 2 ;;
+          esac
+          npm run build:macos -- "$RUNNER_TEMP/untwine-dist"
+      - name: Verify the app bundle
+        run: npm run verify:macos -- "$RUNNER_TEMP/untwine-dist/Untwine.app"

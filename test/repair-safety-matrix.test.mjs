@@ -45,6 +45,7 @@ test("safe repair classes stay metadata-only", async () => {
   assert.deepEqual(safeClasses, [
     "normalize_xml_encoding_declaration",
     "remove_bom",
+    "remove_empty_default_namespace_attribute",
     "restore_trans_unit_id"
   ]);
 
