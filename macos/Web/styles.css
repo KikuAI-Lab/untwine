@@ -200,6 +200,19 @@ h1 {
   transition: border-color 150ms ease, background 150ms ease, transform 150ms ease;
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 .file-card:hover,
 .file-card.is-dragging {
   border-color: var(--accent);
@@ -305,6 +318,11 @@ h1 {
 .file-card:focus-within {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
+}
+
+.file-card:focus-within {
+  border-color: var(--accent);
+  background: #1a201f;
 }
 
 .button:disabled {
@@ -466,6 +484,20 @@ footer {
 
 [hidden] {
   display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+
+  .file-card:active {
+    transform: none;
+  }
 }
 
 @media (max-width: 860px) {

@@ -187,7 +187,7 @@ function renderResult(preview) {
   }
 
   elements.resultPanel.hidden = false;
-  elements.resultPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+  scrollIntoViewRespectingMotion(elements.resultPanel, "start");
 }
 
 async function saveRepair() {
@@ -306,7 +306,18 @@ function reset() {
   elements.translatedDropzone.classList.remove("has-file");
   elements.resultPanel.hidden = true;
   updatePairState();
-  elements.originalDropzone.scrollIntoView({ behavior: "smooth", block: "center" });
+  scrollIntoViewRespectingMotion(elements.originalDropzone, "center");
+}
+
+function scrollIntoViewRespectingMotion(element, block) {
+  element.scrollIntoView({
+    behavior: prefersReducedMotion() ? "auto" : "smooth",
+    block
+  });
+}
+
+function prefersReducedMotion() {
+  return window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches === true;
 }
 
 let toastTimer = null;

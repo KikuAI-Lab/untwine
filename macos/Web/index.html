@@ -43,21 +43,35 @@
 
           <div class="file-grid">
             <label class="file-card" id="originalDropzone" for="originalFile">
-              <input id="originalFile" type="file" accept=".xlf,.xliff,application/xliff+xml" hidden>
+              <input
+                id="originalFile"
+                class="file-input visually-hidden"
+                type="file"
+                accept=".xlf,.xliff,application/xliff+xml"
+                aria-labelledby="originalLabel"
+                aria-describedby="originalHelp originalChoice"
+              >
               <span class="file-step">1</span>
               <span class="file-icon" aria-hidden="true">↑</span>
-              <strong>Original export</strong>
-              <span class="file-help">The untouched XLF/XLIFF exported from the exact course.</span>
-              <span class="file-choice" id="originalChoice">Choose original file</span>
+              <strong id="originalLabel">Original export</strong>
+              <span class="file-help" id="originalHelp">The untouched XLF/XLIFF exported from the exact course.</span>
+              <span class="file-choice" id="originalChoice" aria-live="polite">Choose original file</span>
             </label>
 
             <label class="file-card" id="translatedDropzone" for="translatedFile">
-              <input id="translatedFile" type="file" accept=".xlf,.xliff,application/xliff+xml" hidden>
+              <input
+                id="translatedFile"
+                class="file-input visually-hidden"
+                type="file"
+                accept=".xlf,.xliff,application/xliff+xml"
+                aria-labelledby="translatedLabel"
+                aria-describedby="translatedHelp translatedChoice"
+              >
               <span class="file-step">2</span>
               <span class="file-icon" aria-hidden="true">↑</span>
-              <strong>Translated file</strong>
-              <span class="file-help">The file returned by your translator or CAT tool.</span>
-              <span class="file-choice" id="translatedChoice">Choose translated file</span>
+              <strong id="translatedLabel">Translated file</strong>
+              <span class="file-help" id="translatedHelp">The file returned by your translator or CAT tool.</span>
+              <span class="file-choice" id="translatedChoice" aria-live="polite">Choose translated file</span>
             </label>
           </div>
 

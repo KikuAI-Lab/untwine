@@ -12,6 +12,14 @@ if [[ "$output_root" == "/" || "$output_root" == "${HOME:-/nonexistent}" ]]; the
   exit 2
 fi
 
+package_version="$(node -p 'JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).version' "$repo_root/package.json")"
+bundle_version="$(plutil -extract CFBundleShortVersionString raw "$repo_root/macos/Info.plist")"
+report_version="$(sed -nE 's/^[[:space:]]*version: "([^"]+)",$/\1/p' "$repo_root/macos/Web/app.js" | head -n 1)"
+if [[ -z "$package_version" || "$package_version" != "$bundle_version" || "$bundle_version" != "$report_version" ]]; then
+  echo "Package, app, and report versions must match (package=$package_version, app=$bundle_version, report=$report_version)." >&2
+  exit 2
+fi
+
 architectures=(arm64 x86_64)
 if [[ -n "${UNTWINE_MAC_ARCHS:-}" ]]; then
   read -r -a architectures <<< "$UNTWINE_MAC_ARCHS"
@@ -91,6 +99,8 @@ codesign \
   --force \
   --deep \
   --sign - \
+  --options runtime \
+  --timestamp=none \
   --entitlements "$repo_root/macos/Untwine.entitlements" \
   "$stage_app"
 
@@ -111,6 +121,23 @@ if [[ -e "$app_path" ]]; then
   fi
   rm -rf -- "$app_path"
 fi
-ditto "$stage_app" "$app_path"
+ditto --noextattr --noqtn "$stage_app" "$app_path"
+
+archive_name="Untwine-${bundle_version}-macOS.zip"
+archive_path="$output_root/$archive_name"
+checksum_path="$archive_path.sha256"
+for generated_artifact in "$archive_path" "$checksum_path"; do
+  if [[ -e "$generated_artifact" && ! -f "$generated_artifact" ]]; then
+    echo "Refusing to replace unexpected output: $generated_artifact" >&2
+    exit 2
+  fi
+done
+rm -f -- "$archive_path" "$checksum_path"
+ditto -c -k --keepParent "$app_path" "$archive_path"
+(
+  cd -- "$output_root"
+  shasum -a 256 "$archive_name" > "$(basename -- "$checksum_path")"
+)
 
 printf 'Built %s (%s)\n' "$app_path" "$(lipo -archs "$app_path/Contents/MacOS/UntwineMac")"
+printf 'Packaged %s\nSHA-256 receipt: %s\n' "$archive_path" "$checksum_path"

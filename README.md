@@ -84,7 +84,9 @@ npm run verify:macos
 open dist/Untwine.app
 ```
 
-The default build is a universal `arm64` + `x86_64` app. It is sandboxed and ad-hoc signed for local development. Developer ID/App Store signing, notarization, and distribution remain separate release steps.
+The default build is a universal `arm64` + `x86_64` app. It is sandboxed and ad-hoc signed with the hardened-runtime option for local development. The build writes `Untwine.app`, a versioned `Untwine-<version>-macOS.zip`, and its matching `.sha256` receipt beside the app; verification checks version consistency, the runtime flag, archive integrity/checksum and app-payload parity, bundle resources, entitlements, remote-URL absence, and generated-engine parity. CI sets `UNTWINE_MAC_ARCHS` to its native runner architecture and verifies the resulting thin app through the same path.
+
+This release-candidate slice explicitly defers icon/ICNS generation, a Developer ID identity, a trusted timestamp and notarization, store/Gumroad/payment setup, an updater, analytics, a new framework or runtime, and real Articulate re-import proof. These remain separate owner-controlled release gates.
 
 See the maintained [Mac architecture and privacy boundary](docs/architecture/macos-app.md).
 

@@ -24,11 +24,11 @@ The application has no backend, account, telemetry, update service, translation 
 
 - `macos/Sources/UntwineMac/main.swift` owns app lifecycle, the `WKWebView`, navigation blocking, and native save panels.
 - `macos/Web/` owns the desktop UI only; repair behavior stays in `src/`.
-- `scripts/build-macos-app.sh` builds `arm64` and `x86_64` Swift binaries by default and combines them into `dist/Untwine.app`.
+- `scripts/build-macos-app.sh` builds `arm64` and `x86_64` Swift binaries by default (or the space-separated `UNTWINE_MAC_ARCHS` override used by CI) and combines them into `dist/Untwine.app` when both are present.
 - WebKit does not reliably execute local ES modules from `file://`. The build therefore generates a classic `engine-runtime.js` from the exact canonical engine without adding a bundler dependency or maintaining duplicate parser code. UI and embedded public-demo data remain separate classic scripts.
 - Canonical engine files are also copied into the app bundle. Verification compares them byte-for-byte with `src/`, syntax-checks every runtime script, and runs the generated engine against the canonical module across the complete public proof corpus. The app readiness check fails visibly if the runtime scripts do not finish starting.
 
-The development build is ad-hoc signed. A public build requires an owner-controlled Developer ID or App Store signing identity, hardened-runtime/notarization or App Store packaging, and the corresponding release receipt.
+The development build is ad-hoc signed with `codesign --options runtime --timestamp=none`; the hardened-runtime flag is verified with `codesign -dvv`. The build also writes a versioned `Untwine-<CFBundleShortVersionString>-macOS.zip` and matching SHA-256 receipt beside the app. A public build still requires an owner-controlled Developer ID or App Store signing identity and its corresponding release receipt.
 
 ## Sandbox And Privacy
 
@@ -50,6 +50,6 @@ npm run build:macos
 npm run verify:macos
 ```
 
-The verifier checks bundle identity and minimum OS, required resources, canonical engine copies, generated-engine behavioral equivalence across the proof corpus, JavaScript syntax, signature integrity, sandbox entitlements, absence of remote URLs, executable architectures, and absence of Electron/Node/Tauri runtime linkage.
+The verifier checks package/Info.plist version consistency, bundle identity and minimum OS, required resources, canonical engine copies, generated-engine behavioral equivalence across all 22 proof cases, JavaScript syntax, signature integrity and hardened-runtime flags, sandbox entitlements, absence of remote URLs, executable architectures, ZIP integrity, extracted app-payload parity and SHA-256 receipt, and absence of Electron/Node/Tauri runtime linkage.
 
-The remaining commercial proof gate is external to the repository: successfully re-import an Untwine-repaired real or trial-generated file into the exact Articulate course that produced the original export. A local `clean` verdict is not that proof.
+The release-candidate boundary explicitly defers icon/ICNS generation, Developer ID identity, trusted timestamp/notarization, store/Gumroad/payment, updater, analytics, a new framework/runtime, and real Articulate proof. Successfully re-importing an Untwine-repaired real or trial-generated file into the exact Articulate course that produced the original export remains an external gate; a local `clean` verdict is not that proof.
