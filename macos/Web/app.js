@@ -9,6 +9,7 @@ const state = {
   preview: null,
   repairResult: null
 };
+let operationGeneration = 0;
 
 const elements = {
   originalInput: document.querySelector("#originalFile"),
@@ -122,6 +123,7 @@ function selectInputFile(role, file) {
   state.preview = null;
   state.repairResult = null;
   elements.resultPanel.hidden = true;
+  invalidatePendingWork();
 
   const dropzone = role === "original" ? elements.originalDropzone : elements.translatedDropzone;
   const choice = role === "original" ? elements.originalChoice : elements.translatedChoice;
@@ -146,15 +148,20 @@ async function runAnalysis() {
     return;
   }
 
+  const pair = [state.original, state.translated];
+  const operation = invalidatePendingWork();
   setBusy(true, "Analyzing structure…");
   try {
-    state.preview = await analyze([state.original, state.translated]);
+    const preview = await analyze(pair);
+    if (operation !== operationGeneration) return;
+    state.preview = preview;
     state.repairResult = null;
     renderResult(state.preview);
   } catch (error) {
+    if (operation !== operationGeneration) return;
     showToast(error instanceof Error ? error.message : "Untwine could not analyze this pair.");
   } finally {
-    setBusy(false);
+    if (operation === operationGeneration) setBusy(false);
   }
 }
 
@@ -195,26 +202,33 @@ async function saveRepair() {
     return;
   }
 
+  const pair = [state.original, state.translated];
+  const operation = invalidatePendingWork();
   elements.repairButton.disabled = true;
   elements.repairButton.textContent = "Preparing safe copy…";
   try {
-    state.repairResult ||= await repair([state.original, state.translated]);
-    if (!state.repairResult.ok || typeof state.repairResult.text !== "string") {
+    const result = state.repairResult || await repair(pair);
+    if (operation !== operationGeneration) return;
+    state.repairResult = result;
+    if (!result.ok || typeof result.text !== "string") {
       showToast("Untwine blocked this repair after its final safety check.");
       return;
     }
 
     requestSave({
       kind: "repair",
-      name: repairedFileName(state.translated.name),
-      text: state.repairResult.text,
-      mimeType: state.repairResult.mimeType || "application/xliff+xml"
+      name: repairedFileName(pair[1].name),
+      text: result.text,
+      mimeType: result.mimeType || "application/xliff+xml"
     });
   } catch (error) {
+    if (operation !== operationGeneration) return;
     showToast(error instanceof Error ? error.message : "Untwine could not prepare the repaired copy.");
   } finally {
-    elements.repairButton.disabled = false;
-    elements.repairButton.textContent = "Save repaired copy";
+    if (operation === operationGeneration) {
+      elements.repairButton.disabled = false;
+      elements.repairButton.textContent = "Save repaired copy";
+    }
   }
 }
 
@@ -256,8 +270,7 @@ function requestSave(payload) {
 }
 
 async function loadDemo() {
-  elements.demoButton.disabled = true;
-  elements.demoButton.textContent = "Loading demo…";
+  let operation = operationGeneration;
   try {
     const demo = window.untwineDemo;
     if (typeof demo?.original !== "string" || typeof demo?.translated !== "string") {
@@ -266,13 +279,31 @@ async function loadDemo() {
 
     selectInputFile("original", new File([demo.original], "demo-articulate-original.xlf", { type: "application/xliff+xml" }));
     selectInputFile("translated", new File([demo.translated], "demo-articulate-translated-safe-repair.xlf", { type: "application/xliff+xml" }));
-    await runAnalysis();
+    const analysis = runAnalysis();
+    operation = operationGeneration;
+    elements.demoButton.disabled = true;
+    elements.demoButton.textContent = "Loading demo…";
+    await analysis;
   } catch (error) {
+    if (operation !== operationGeneration) return;
     showToast(error instanceof Error ? error.message : "Untwine could not load the demo.");
   } finally {
-    elements.demoButton.disabled = false;
-    elements.demoButton.textContent = "Use safe demo";
+    if (operation === operationGeneration) {
+      elements.demoButton.disabled = false;
+      elements.demoButton.textContent = "Use safe demo";
+    }
   }
+}
+
+function invalidatePendingWork() {
+  // File selection and reset cancel ownership of any pending engine result.
+  operationGeneration += 1;
+  elements.repairButton.disabled = false;
+  elements.repairButton.textContent = "Save repaired copy";
+  elements.demoButton.disabled = false;
+  elements.demoButton.textContent = "Use safe demo";
+  setBusy(false);
+  return operationGeneration;
 }
 
 function setBusy(busy, message = "") {
@@ -305,7 +336,7 @@ function reset() {
   elements.originalDropzone.classList.remove("has-file");
   elements.translatedDropzone.classList.remove("has-file");
   elements.resultPanel.hidden = true;
-  updatePairState();
+  invalidatePendingWork();
   scrollIntoViewRespectingMotion(elements.originalDropzone, "center");
 }
 
