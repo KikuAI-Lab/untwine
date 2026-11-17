@@ -5,6 +5,10 @@ import WebKit
 private let saveMessageHandler = "untwineSave"
 private let readyMessageHandler = "untwineReady"
 
+func writeSavedText(_ text: String, to destination: URL) throws {
+  try Data(text.utf8).write(to: destination, options: .atomic)
+}
+
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKScriptMessageHandler, WKUIDelegate {
   private var window: NSWindow?
@@ -13,9 +17,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
   private var hasShownFatalError = false
   private var hasInterfaceStarted = false
   private var startupCheck: DispatchWorkItem?
+#if DEBUG
+  private var nativeQA: NativeQA?
+#endif
 
   func applicationDidFinishLaunching(_ notification: Notification) {
+#if DEBUG
+    if NativeQA.requested {
+      do {
+        nativeQA = try NativeQA()
+        nativeQA?.armTimeout()
+      } catch {
+        fputs("Untwine QA refused unsafe or unavailable setup.\n", stderr)
+        NSApp.terminate(nil)
+        return
+      }
+    } else {
+      configureMainMenu()
+    }
+#else
     configureMainMenu()
+#endif
 
     let contentController = WKUserContentController()
     contentController.add(self, name: saveMessageHandler)
@@ -40,13 +62,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
     window.minSize = NSSize(width: 820, height: 620)
     window.contentView = webView
     window.center()
+#if DEBUG
+    if nativeQA == nil { window.makeKeyAndOrderFront(nil) }
+    else { window.ignoresMouseEvents = true }
+#else
     window.makeKeyAndOrderFront(nil)
+#endif
 
     self.window = window
     self.webView = webView
 
     loadBundledInterface(in: webView)
+#if DEBUG
+    if nativeQA == nil { NSApp.activate(ignoringOtherApps: true) }
+#else
     NSApp.activate(ignoringOtherApps: true)
+#endif
   }
 
   func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
@@ -62,6 +93,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
       hasInterfaceStarted = true
       startupCheck?.cancel()
       startupCheck = nil
+#if DEBUG
+      if message.frameInfo.isMainFrame { nativeQA?.start(in: message.webView) }
+#endif
       return
     }
 
@@ -73,9 +107,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
           let proposedName = body["name"] as? String,
           let text = body["text"] as? String
     else {
+#if DEBUG
+      if message.name == saveMessageHandler { nativeQA?.fail("unexpected_save") }
+#endif
       return
     }
 
+#if DEBUG
+    if let nativeQA {
+      guard message.frameInfo.isMainFrame else { nativeQA.fail("unexpected_frame"); return }
+      nativeQA.save(kind: kind, name: proposedName, text: text) { [weak self] completion in
+        self?.webView?.evaluateJavaScript("window.untwineDidSave?.({saved:true,message:'Saved translated.repaired.xlf'});") { _, _ in
+          completion()
+        }
+      }
+      return
+    }
+#endif
     presentSavePanel(kind: kind, proposedName: proposedName, text: text)
   }
 
@@ -144,6 +192,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
     initiatedByFrame frame: WKFrameInfo,
     completionHandler: @escaping ([URL]?) -> Void
   ) {
+#if DEBUG
+    if let nativeQA {
+      nativeQA.fail("unexpected_open_panel")
+      completionHandler(nil)
+      return
+    }
+#endif
     guard let window else {
       completionHandler(nil)
       return
@@ -195,7 +250,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
       }
 
       do {
-        try Data(text.utf8).write(to: destination, options: .atomic)
+        try writeSavedText(text, to: destination)
         self?.notifyWebView(saved: true, message: "Saved \(destination.lastPathComponent)")
       } catch {
         self?.showError("Untwine could not save the file.", detail: error.localizedDescription)
@@ -231,6 +286,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
   }
 
   private func showFatalError(_ message: String) {
+#if DEBUG
+    if let nativeQA { nativeQA.fail("interface_failure"); return }
+#endif
     guard !hasShownFatalError else { return }
     hasShownFatalError = true
     showError("Untwine could not start.", detail: message)
@@ -278,7 +336,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
 MainActor.assumeIsolated {
   let application = NSApplication.shared
   let delegate = AppDelegate()
+#if DEBUG
+  application.setActivationPolicy(NativeQA.requested ? .prohibited : .regular)
+#else
   application.setActivationPolicy(.regular)
+#endif
   application.delegate = delegate
   withExtendedLifetime(delegate) {
     application.run()
