@@ -166,6 +166,9 @@ async function inspectFile(file, role) {
   let parseOk = false;
 
   try {
+    if (payload.invalidUtf8) {
+      throw new XmlParseError("invalid_utf8", "This file is not valid UTF-8.");
+    }
     document = parseXml(payload.text);
     root = document.documentElement;
     parseOk = true;
@@ -458,6 +461,10 @@ function publicIssue(item) {
   };
   if (item.role) {
     output.role = item.role;
+    if (item.category === "invalid_utf8") {
+      output.id = `${item.category}-${item.role}`;
+      output.location = `${item.role} file`;
+    }
   }
   if (item.unitIndex !== undefined) {
     output.location = `translated trans-unit ${item.unitIndex + 1}`;
@@ -470,7 +477,7 @@ function publicIssue(item) {
 }
 
 function unsupportedBucket(issues) {
-  const priority = ["wrong_extension", "malformed_xml", "invalid_entities", "wrong_wrapper", "unsupported_xliff_version", "invalid_file_pair"];
+  const priority = ["wrong_extension", "invalid_utf8", "malformed_xml", "invalid_entities", "wrong_wrapper", "unsupported_xliff_version", "invalid_file_pair"];
   const found = priority.find((category) => issues.some((item) => item.category === category));
   if (!found) {
     return {
@@ -656,11 +663,17 @@ function repairedArtifact(beforeResult, afterResult, text, edits, ok) {
 async function readFilePayload(file) {
   let text = "";
   let hasBom = false;
+  let invalidUtf8 = false;
 
   if (file && typeof file.arrayBuffer === "function") {
     const bytes = new Uint8Array(await file.arrayBuffer());
     hasBom = bytes.length >= 3 && bytes[0] === 0xef && bytes[1] === 0xbb && bytes[2] === 0xbf;
-    text = new TextDecoder("utf-8", { fatal: false, ignoreBOM: true }).decode(bytes);
+    try {
+      text = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(bytes);
+    } catch (error) {
+      if (!(error instanceof TypeError)) throw error;
+      invalidUtf8 = true;
+    }
   } else if (file && typeof file.text === "function") {
     text = await file.text();
     hasBom = text.startsWith("\uFEFF");
@@ -675,6 +688,7 @@ async function readFilePayload(file) {
   return {
     text,
     hasBom,
+    invalidUtf8,
     extension: extensionFromName(file?.name ?? ""),
     encodingDeclaration: findXmlEncodingDeclaration(text)
   };
@@ -711,6 +725,9 @@ function extensionFromName(name) {
 }
 
 function parseFailureMessage(category) {
+  if (category === "invalid_utf8") {
+    return "This file is not valid UTF-8. Re-export it as UTF-8 before trying again.";
+  }
   if (category === "invalid_entities") {
     return "The XML contains invalid or unsupported entities.";
   }
@@ -721,6 +738,7 @@ function unsupportedReason(category) {
   const reasons = {
     invalid_file_pair: "Upload exactly the original and translated XLIFF files.",
     wrong_extension: "Only .xlf and .xliff files are supported here.",
+    invalid_utf8: "Both files must be UTF-8 to compare and repair without losing text.",
     malformed_xml: "The translated XML is malformed, so safe comparison is not possible.",
     invalid_entities: "The XML contains invalid entities that must be fixed before import.",
     wrong_wrapper: "The XML root is not an XLIFF wrapper.",

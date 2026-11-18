@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-06-18",
+  "updatedAt": "2026-11-18",
   "product": "Untwine",
   "scope": "Articulate-style original plus translated XLIFF 1.2 file pairs.",
   "decision": "Only deterministic metadata-preserving repair classes may emit a repaired XLIFF. Anything that changes translated target text, changes trans-unit count, changes protected inline signatures, changes XLIFF version, or requires semantic judgement is diagnosis-only or rejected.",
@@ -14,7 +14,7 @@
     {
       "id": "normalize_xml_encoding_declaration",
       "action": "safe_repair",
-      "allowedWhen": "The XML declaration advertises a non-UTF-8 encoding while the payload is already readable as text.",
+      "allowedWhen": "The XML declaration advertises a non-UTF-8 encoding while the payload is already valid UTF-8.",
       "mustNotChange": ["element order", "source text", "target text", "inline tags"]
     },
     {
@@ -39,7 +39,7 @@
     {
       "category": "encoding_declaration_mismatch",
       "defaultAction": "safe_repair",
-      "reason": "The declaration value can be normalized without touching XML content."
+      "reason": "Valid UTF-8 needs only the declaration value corrected."
     },
     {
       "category": "empty_default_namespace_attribute",
@@ -75,6 +75,11 @@
       "category": "namespace_version_drift",
       "defaultAction": "unrepairable",
       "reason": "The translated file no longer matches the original XLIFF 1.2 namespace/version contract."
+    },
+    {
+      "category": "invalid_utf8",
+      "defaultAction": "unsupported",
+      "reason": "Both inputs must decode as UTF-8 without character substitution before XML comparison."
     },
     {
       "category": "malformed_xml",

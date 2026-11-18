@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { test } from "node:test";
@@ -27,6 +27,47 @@ function virtualFile(name, text) {
 function sortedCategories(preview) {
   return [...new Set(preview.issues.map((issue) => issue.category))].sort();
 }
+
+test("rejects undecodable input on either side and preserves valid mislabeled UTF-8", async () => {
+  const original = await readFile(path.join(root, "demo-files/demo-articulate-original.xlf"));
+  const translation = (await readFile(path.join(root, "demo-files/demo-articulate-translated-safe-repair.xlf"), "utf8"))
+    .replace("Bienvenue", "Bienvenue au café");
+  const legacy = Buffer.from(translation, "latin1");
+  const valid = new File([translation], "translated.xlf");
+  const bad = new File([legacy], "invalid.xlf");
+  const source = new File([original], "original.xlf");
+
+  for (const [role, files] of [["original", [bad, valid]], ["translated", [source, bad]]]) {
+    const result = await repair(files);
+    assert.equal(result.ok, false);
+    assert.equal(result.text, null);
+    assert.equal(result.preview.unsupported.code, "invalid_utf8");
+    assert.deepEqual(result.preview.issues.filter((issue) => issue.category === "invalid_utf8").map((issue) => issue.role), [role]);
+    assert.equal(result.preview.files.find((file) => file.role === role).parse.ok, false);
+    assert.equal(result.preview.issues[0].location, `${role} file`);
+  }
+  const both = await analyze([bad, bad]);
+  assert.deepEqual(both.issues.map(({ id }) => id), ["invalid_utf8-original", "invalid_utf8-translated"]);
+  const replacementCharacter = new File([translation.replace("café", "café �")], "translated.xlf");
+  const fixed = await repair([source, replacementCharacter]);
+  assert.equal(fixed.ok, true);
+  assert.match(fixed.text, /encoding="UTF-8"/);
+  assert.match(fixed.text, /Bienvenue au café �/);
+
+  const directory = await mkdtemp(path.join(os.tmpdir(), "untwine-cli-invalid-utf8-"));
+  try {
+    const paths = ["original.xlf", "translated.xlf", "output.xlf"].map((name) => path.join(directory, name));
+    const sentinel = "pre-existing output";
+    await Promise.all([writeFile(paths[0], original), writeFile(paths[1], legacy), writeFile(paths[2], sentinel)]);
+    const failed = spawnSync(process.execPath, [cliPath, "repair", paths[0], paths[1], "--out", paths[2]], { encoding: "utf8" });
+    assert.equal(failed.status, 2);
+    assert.match(failed.stdout, /Re-export it as UTF-8/);
+    assert.equal(await readFile(paths[2], "utf8"), sentinel);
+    assert.deepEqual(await readFile(paths[1]), legacy);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
 
 test("runs the analyzer and repair flow across the public proof corpus", async () => {
   const manifest = JSON.parse(await readCorpus("proof-corpus/manifest.json"));

@@ -97,13 +97,8 @@ function parseArgs(args) {
 }
 
 async function fileFromPath(filePath) {
-  const text = await readFile(filePath, "utf8");
-  return {
-    name: path.basename(filePath),
-    async text() {
-      return text;
-    }
-  };
+  const bytes = await readFile(filePath);
+  return new File([bytes], path.basename(filePath));
 }
 
 function printHumanAnalysis(result) {

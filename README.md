@@ -102,7 +102,7 @@ See the maintained [Mac architecture and privacy boundary](docs/architecture/mac
 - missing translated `target` elements
 - source/target inline tag count drift
 - protected inline tag rewrites
-- UTF-8 BOM and XML encoding declaration issues
+- invalid UTF-8, UTF-8 BOM and XML encoding declaration issues
 - empty default namespace attributes introduced inside translated source/target content
 
 ## Safe Repairs
@@ -110,7 +110,7 @@ See the maintained [Mac architecture and privacy boundary](docs/architecture/mac
 The current repair engine is conservative. It can safely:
 
 - remove a UTF-8 BOM
-- normalize the XML declaration to UTF-8
+- normalize the XML declaration to UTF-8 when the file bytes already decode as UTF-8
 - restore missing or changed translated `trans-unit` ids when the original and translated unit order still matches
 - remove empty `xmlns=""` attributes only inside translated `source` or `target` subtrees
 
