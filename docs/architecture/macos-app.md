@@ -16,7 +16,7 @@ It is not a translator, CAT tool, TMS, generic XLIFF editor, cloud service, or s
 2. The bundled copy of `src/index.js` and `src/xml.js` analyzes both files in memory.
 3. A repair action remains unavailable unless the engine returns `repairable`.
 4. AppKit presents `NSSavePanel`; only the newly generated repair or diagnosis is written to the user-selected location.
-5. The diagnosis report excludes file names and course text.
+5. The diagnosis report contains issue categories, segment positions, and repair guidance. It excludes file metadata, course text, and raw XML fragments.
 
 The application has no backend, account, telemetry, update service, translation API, or remote content.
 

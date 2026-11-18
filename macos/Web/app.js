@@ -237,14 +237,21 @@ function saveReport() {
     return;
   }
 
+  const { summary, repairability, unsupported, issues, sampleDiff } = state.preview;
   const report = {
     product: "Untwine for Mac",
     version: "0.1.0",
     generatedAt: new Date().toISOString(),
     scope: "Articulate-style original and translated XLIFF 1.2 pair",
-    privacy: "Generated locally. File names and course text are not included.",
+    privacy: "Generated locally from issue categories, segment positions, and repair guidance.",
     caveat: "A clean or repaired result does not guarantee that Articulate will accept the import.",
-    result: state.preview
+    result: {
+      summary,
+      repairability,
+      unsupported,
+      issues,
+      sampleDiff: sampleDiff ? { repairClass: sampleDiff.repairClass, description: sampleDiff.description } : null
+    }
   };
 
   requestSave({

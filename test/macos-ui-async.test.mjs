@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
 import { runInNewContext } from "node:vm";
+import { analyze } from "../src/index.js";
 
 const appSource = await readFile(new URL("../macos/Web/app.js", import.meta.url), "utf8");
 const preview = (count) => ({
@@ -153,4 +154,33 @@ test("old demo finalization cannot enable a newer pending demo", async () => {
   await current;
   assert.equal(ui.node("#demoButton").disabled, false);
   assert.equal(ui.node("#totalCount").textContent, "2");
+});
+
+test("shareable native report retains positions and excludes identifiers and raw XML metadata", async () => {
+  const ui = mount();
+  ui.pair("private-file");
+  const analysis = ui.click("analyzeButton");
+  const fixture = (id) => `<?xml version="1.0" encoding="UTF-8"?>
+    <xliff xmlns="urn:private-namespace" version="1.2"><file original="private-course"><body>
+      <trans-unit id="${id}"><source>private-source</source><target>private-target</target></trans-unit>
+    </body></file></xliff>`;
+  const result = await analyze([
+    { name: "private-file-original.xlf", text: () => fixture("private-original-id") },
+    { name: "private-file-translated.xlf", text: () => fixture("private-translated-id") }
+  ]);
+  assert.equal(result.files[0].namespace, "urn:private-namespace");
+  assert.match(result.sampleDiff.before, /private-translated-id/);
+  ui.analyses[0].resolve(result);
+  await analysis;
+  ui.click("reportButton");
+
+  assert.equal(ui.saves.length, 1);
+  const { kind, name, text } = ui.saves[0];
+  assert.equal(kind, "report");
+  assert.equal(name, "untwine-diagnosis.json");
+  assert.doesNotMatch(text, /private-|id="/);
+  const report = JSON.parse(text).result;
+  assert.equal(report.issues.find(({ category }) => category === "changed_trans_unit_id").location, "translated trans-unit 1");
+  assert.deepEqual(Object.keys(report.sampleDiff).sort(), ["description", "repairClass"]);
+  assert.equal(report.sampleDiff.repairClass, "restore_trans_unit_id");
 });
