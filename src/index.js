@@ -251,9 +251,17 @@ function comparePair(original, translated, issues) {
     );
   }
 
+  const originalIds = new Set();
+  const sourceCounts = new Map();
+  for (const unit of original.transUnits) {
+    const id = attr(unit, "id");
+    if (id) originalIds.add(id);
+    const source = sourceIdentity(childElement(unit, "source"));
+    sourceCounts.set(source, (sourceCounts.get(source) ?? 0) + 1);
+  }
   const unitCount = Math.min(original.transUnits.length, translated.transUnits.length);
   for (let index = 0; index < unitCount; index += 1) {
-    compareUnit(original.transUnits[index], translated.transUnits[index], index, issues);
+    compareUnit(original.transUnits[index], translated.transUnits[index], index, issues, originalIds, sourceCounts);
   }
 }
 
@@ -323,10 +331,53 @@ function collectEmptyDefaultNamespaceAttributes(node, text, unitIndex, matches) 
   }
 }
 
-function compareUnit(originalUnit, translatedUnit, unitIndex, issues) {
+function sourceIdentity(node) {
+  if (!node) return null;
+
+  function structure(element) {
+    const attributes = element.attrs
+      .map(({ name, value }) => [name, value])
+      .sort(([left], [right]) => left < right ? -1 : Number(left > right));
+    const content = [];
+    for (const child of element.children) {
+      if (child.type === "text" && typeof content[content.length - 1] === "string") {
+        content[content.length - 1] += child.value;
+      } else {
+        content.push(child.type === "text" ? child.value : structure(child));
+      }
+    }
+    return [element.name, attributes, content];
+  }
+
+  return JSON.stringify(structure(node));
+}
+
+function compareUnit(originalUnit, translatedUnit, unitIndex, issues, originalIds, sourceCounts) {
   const originalId = attr(originalUnit, "id");
   const translatedId = attr(translatedUnit, "id");
   const translatedIdMeta = attrMeta(translatedUnit, "id");
+  const originalSource = childElement(originalUnit, "source");
+
+  if (originalId && originalId !== translatedId) {
+    const source = sourceIdentity(originalSource);
+    const translatedSource = sourceIdentity(childElement(translatedUnit, "source"));
+    if (
+      originalIds.has(translatedId) ||
+      source === null ||
+      sourceCounts.get(source) !== 1 ||
+      source !== translatedSource
+    ) {
+      issues.push(
+        issue(
+          "trans_unit_alignment_uncertain",
+          "critical",
+          "The translated unit cannot be matched to the original in this position. Check that the files come from the same export and preserve unit order.",
+          { role: "translated", unitIndex }
+        )
+      );
+      return;
+    }
+  }
 
   if (!translatedId && originalId) {
     issues.push(
@@ -371,7 +422,6 @@ function compareUnit(originalUnit, translatedUnit, unitIndex, issues) {
     return;
   }
 
-  const originalSource = childElement(originalUnit, "source");
   if (!originalSource) {
     return;
   }
@@ -512,7 +562,7 @@ function repairabilityVerdict(issues, unsupported) {
       reasons: ["Only safe repair classes were detected."]
     };
   }
-  if (issues.some((item) => item.category === "missing_target" || item.category === "source_target_tag_count_drift" || item.category === "protected_inline_tag_rewrite")) {
+  if (issues.some((item) => item.category === "missing_target" || item.category === "source_target_tag_count_drift" || item.category === "protected_inline_tag_rewrite" || item.category === "trans_unit_alignment_uncertain")) {
     return {
       verdict: "manual_review",
       reasons: ["The tool can diagnose this structure drift but will not rewrite translated text automatically."]

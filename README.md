@@ -111,7 +111,7 @@ The current repair engine is conservative. It can safely:
 
 - remove a UTF-8 BOM
 - normalize the XML declaration to UTF-8 when the file bytes already decode as UTF-8
-- restore missing or changed translated `trans-unit` ids when the original and translated unit order still matches
+- restore missing or changed translated `trans-unit` ids when a unique original source matches the translated source text and markup at each repaired position and the translated ID does not belong to another original unit
 - remove empty `xmlns=""` attributes only inside translated `source` or `target` subtrees
 
 It blocks repairs when the file needs human review or when an automated edit could corrupt translated content.

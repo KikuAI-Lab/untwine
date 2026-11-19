@@ -257,3 +257,54 @@ test("CLI analyzes a broken translated file and writes a safe repaired XLIFF", a
     await rm(tempDir, { recursive: true, force: true });
   }
 });
+
+test("refuses to move translations between uncertain trans-unit matches", async () => {
+  const document = (units) =>
+    '<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">' +
+    '<file source-language="en" target-language="fr" original="lab-training"><body>' +
+    units.join("") + "</body></file></xliff>";
+  const unit = (id, source, target) =>
+    `<trans-unit id="${id}"><source>${source}</source><target>${target}</target></trans-unit>`;
+  const badge = unit("badge-title", "Wear your safety badge", "Portez votre badge de sécurité");
+  const door = unit("door-title", "Close the lab door", "Fermez la porte du laboratoire");
+  const original = document([badge, door]);
+  const analyzePair = (source, translated) =>
+    repair([virtualFile("original.xlf", source), virtualFile("translated.xlf", translated)]);
+
+  const repeatBadge = unit("badge-title", "Continue", "Suivant");
+  const repeatDoor = unit("door-title", "Continue", "Continuer");
+  const boldFirst = unit("badge-title", '<g id="1">Warning</g> label', '<g id="1">Texte</g> A');
+  const boldLast = unit("door-title", 'Warning <g id="1">label</g>', 'Texte <g id="1">B</g>');
+  for (const [source, translation] of [
+    [original, document([door, badge])],
+    [original, document([door.replace("door-title", "other-door"), badge.replace("badge-title", "other-badge")])],
+    [document([repeatBadge, repeatDoor]), document([repeatDoor, repeatBadge])],
+    [document([repeatBadge, repeatDoor]), document([repeatDoor.replace("door-title", "other-door"), repeatBadge.replace("badge-title", "other-badge")])],
+    [document([boldFirst, boldLast]), document([boldLast.replace("door-title", "other-door"), boldFirst.replace("badge-title", "other-badge")])],
+    [original, document([badge.replace('id="badge-title"', "").replace(/<source>.*?<\/source>/, ""), door])],
+    [original, document([badge.replace("badge-title", "other-badge").replace("<source>Wear", '<source><x id="1"/>Wear'), door])]
+  ]) {
+    const result = await analyzePair(source, translation);
+    assert.equal(result.ok, false);
+    assert.equal(result.reason, "manual_review");
+    assert.equal(result.text, null);
+    assert.ok(result.preview.issues.some(({ category }) => category === "trans_unit_alignment_uncertain"));
+    assert.doesNotMatch(JSON.stringify(result.analyticsEvent), /Portez|Fermez|Suivant|Continuer/);
+  }
+
+  const translated = original.replace("badge-title", "reimported-title");
+  const repaired = await analyzePair(original, translated);
+  assert.equal(repaired.ok, true);
+  assert.equal(repaired.text, original);
+
+  const originalWithMarkup = document([
+    unit("entity-title", '<g id="1" ctype="x-bold">Badge &amp; gloves</g>', '<g id="1" ctype="x-bold">Badge et gants</g>')
+  ]);
+  const equivalentSource = originalWithMarkup
+    .replace("entity-title", "reimported-entity")
+    .replace('<g id="1" ctype="x-bold">Badge &amp; gloves</g>',
+      '<g ctype="x-bold" id="1">Badge <!-- split text -->&#38; gloves</g>');
+  const repairedEquivalent = await analyzePair(originalWithMarkup, equivalentSource);
+  assert.equal(repairedEquivalent.ok, true);
+  assert.equal(repairedEquivalent.text, equivalentSource.replace("reimported-entity", "entity-title"));
+});

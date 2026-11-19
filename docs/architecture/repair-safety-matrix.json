@@ -26,7 +26,7 @@
     {
       "id": "restore_trans_unit_id",
       "action": "safe_repair",
-      "allowedWhen": "Original and translated trans-unit counts match, unit order matches, and only missing or changed translated trans-unit id attributes differ.",
+      "allowedWhen": "Original and translated trans-unit counts match. At each ID repair the sources match in text and inline structure, the original source is unique, and the translated ID does not belong to another original unit.",
       "mustNotChange": ["source text", "target text", "inline tags", "trans-unit count"]
     }
   ],
@@ -55,6 +55,11 @@
       "category": "missing_trans_unit_id",
       "defaultAction": "conditional",
       "reason": "Missing id is repairable only when the translated file still has the same trans-unit count and order. Missing or extra units are unrepairable."
+    },
+    {
+      "category": "trans_unit_alignment_uncertain",
+      "defaultAction": "manual_review",
+      "reason": "Changed or missing source content, repeated original sources, or a relocated original ID makes positional restoration unsafe."
     },
     {
       "category": "missing_target",
