@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { link, mkdtemp, readFile, readdir, rm, symlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { test } from "node:test";
@@ -64,6 +64,50 @@ test("rejects undecodable input on either side and preserves valid mislabeled UT
     assert.match(failed.stdout, /Re-export it as UTF-8/);
     assert.equal(await readFile(paths[2], "utf8"), sentinel);
     assert.deepEqual(await readFile(paths[1]), legacy);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("CLI repair creates a new output without overwriting existing files or aliases", async () => {
+  const directory = await mkdtemp(path.join(os.tmpdir(), "untwine-cli-fresh-output-"));
+  try {
+    const original = path.join(directory, "original.xlf");
+    const translation = path.join(directory, "translated.xlf");
+    const existing = path.join(directory, "existing.xlf");
+    const aliased = path.join(directory, "hardlink.xlf");
+    const symbolic = path.join(directory, "symlink.xlf");
+    const output = path.join(directory, "repaired.xlf");
+    const originalBytes = await readFile(path.join(root, "demo-files/demo-articulate-original.xlf"));
+    const translatedBytes = await readFile(path.join(root, "demo-files/demo-articulate-translated-safe-repair.xlf"));
+
+    await writeFile(original, originalBytes);
+    await writeFile(translation, translatedBytes);
+    await writeFile(existing, "Earlier repair");
+    await link(original, aliased);
+    await symlink(translation, symbolic);
+
+    const run = (destination) => spawnSync(process.execPath, [
+      cliPath, "repair", original, translation, "--out", destination
+    ], { encoding: "utf8" });
+    for (const destination of [original, translation, existing, aliased, symbolic]) {
+      const result = run(destination);
+      assert.equal(result.status, 1);
+      assert.match(result.stderr, /Output already exists.*Choose a new file/);
+    }
+    assert.deepEqual(await readFile(original), originalBytes);
+    assert.deepEqual(await readFile(translation), translatedBytes);
+    assert.equal(await readFile(existing, "utf8"), "Earlier repair");
+    assert.deepEqual(await readFile(aliased), originalBytes);
+    assert.deepEqual(await readFile(symbolic), translatedBytes);
+
+    const result = run(output);
+    assert.equal(result.status, 0, result.stderr);
+    const analyzed = spawnSync(process.execPath, [cliPath, "analyze", original, output], { encoding: "utf8" });
+    assert.equal(analyzed.status, 0, analyzed.stderr);
+    assert.match(analyzed.stdout, /Verdict: clean/);
+    assert.deepEqual((await readdir(directory)).sort(),
+      ["existing.xlf", "hardlink.xlf", "original.xlf", "repaired.xlf", "symlink.xlf", "translated.xlf"]);
   } finally {
     await rm(directory, { recursive: true, force: true });
   }

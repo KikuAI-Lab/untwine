@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
-import { readFile, writeFile } from "node:fs/promises";
+import { link, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { analyze, repair } from "../src/index.js";
 
 const USAGE = `Usage:
   articulate-xliff-doctor analyze <original.xlf> <translated.xlf> [--json]
-  articulate-xliff-doctor repair <original.xlf> <translated.xlf> --out <repaired.xlf>
+  articulate-xliff-doctor repair <original.xlf> <translated.xlf> --out <new-repaired.xlf>
 
 Examples:
   articulate-xliff-doctor analyze original.xlf translated.xlf
@@ -36,7 +36,7 @@ async function main(argv) {
   }
 
   if (command === "repair" && !outPath) {
-    console.error("Repair requires --out <repaired.xlf>.");
+    console.error("Repair requires --out <new-repaired.xlf>.");
     console.error(USAGE);
     return 1;
   }
@@ -64,7 +64,7 @@ async function main(argv) {
     return 2;
   }
 
-  await writeFile(outPath, result.text, "utf8");
+  await writeNewOutput(outPath, result.text);
   if (json) {
     console.log(JSON.stringify({ ...result, output: outPath, text: undefined }, null, 2));
   } else {
@@ -72,6 +72,23 @@ async function main(argv) {
     console.log(`Critical issues after repair: ${result.report.after.criticalIssues}`);
   }
   return 0;
+}
+
+async function writeNewOutput(outPath, text) {
+  const stagingDirectory = await mkdtemp(path.join(path.dirname(outPath), ".untwine-output-"));
+  try {
+    const stagingFile = path.join(stagingDirectory, "repaired.xlf");
+    await writeFile(stagingFile, text, "utf8");
+    // Create the final name only after the full file is written, without replacing any entry.
+    await link(stagingFile, outPath);
+  } catch (error) {
+    if (error.code === "EEXIST") {
+      throw new Error("Output already exists. Choose a new file for --out.");
+    }
+    throw error;
+  } finally {
+    await rm(stagingDirectory, { recursive: true, force: true });
+  }
 }
 
 function parseArgs(args) {
