@@ -1,4 +1,5 @@
 import AppKit
+import Darwin
 import UniformTypeIdentifiers
 import WebKit
 
@@ -6,7 +7,28 @@ private let saveMessageHandler = "untwineSave"
 private let readyMessageHandler = "untwineReady"
 
 func writeSavedText(_ text: String, to destination: URL) throws {
-  try Data(text.utf8).write(to: destination, options: .atomic)
+  let fileManager = FileManager.default
+  let stagingDirectory = try fileManager.url(
+    for: .itemReplacementDirectory,
+    in: .userDomainMask,
+    appropriateFor: destination,
+    create: true
+  )
+  defer { try? fileManager.removeItem(at: stagingDirectory) }
+
+  let staged = stagingDirectory.appendingPathComponent("output")
+  try Data(text.utf8).write(to: staged)
+
+  // Publish the completed file only if the chosen name is still free.
+  guard renamex_np(staged.path, destination.path, UInt32(RENAME_EXCL)) == 0 else {
+    let failure = errno
+    if failure == EEXIST {
+      throw CocoaError(.fileWriteFileExists, userInfo: [
+        NSLocalizedDescriptionKey: "A file already exists at this location. Choose a new filename."
+      ])
+    }
+    throw POSIXError(POSIXErrorCode(rawValue: failure) ?? .EIO)
+  }
 }
 
 @MainActor
